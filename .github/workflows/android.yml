@@ -50,6 +50,7 @@ jobs:
           open("/tmp/deutschkarten-inline.js", "w", encoding="utf-8").write(scripts[-1])
           PY
           node --check /tmp/deutschkarten-inline.js
+          node --check ai-worker/index.mjs
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
