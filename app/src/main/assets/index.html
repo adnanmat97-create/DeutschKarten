@@ -687,6 +687,10 @@ window.onNativeCsvFileSelected=function(text,name){
  try{const result=importCSVText(text,name);$("csvFileStatus").textContent=name+": "+messageText("csvImportDone",{cards:result.count,deck:result.deck})}
  catch(error){$("csvFileStatus").textContent=error.message||tr("csvImportError")}
 };
+window.onNativeCsvImportError=function(payload){
+ try{const result=typeof payload==="string"?JSON.parse(payload):payload;$("csvFileStatus").textContent=result?.message||tr("csvImportError")}
+ catch(error){$("csvFileStatus").textContent=tr("csvImportError")}
+};
 $("exportBtn").onclick=()=>{let rows=[["German","Meaning","Example"],...deck().cards.map(c=>[c.de,c.ar,c.ex])];download("deutschkarten.csv",rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(";")).join("\n"),"text/csv")};
 function messageText(key,values){let text=tr(key);Object.keys(values||{}).forEach(k=>{text=text.replace("{"+k+"}",String(values[k]))});return text}
 $("importNojiBtn").onclick=()=>{
