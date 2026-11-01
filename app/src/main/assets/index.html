@@ -41,6 +41,7 @@ input,textarea,select{width:100%;padding:11px;margin:4px 0 9px;border:1px solid 
 <div class="panel"><b data-i="data">البيانات</b><button class="secondary wide" id="backupBtn" data-i="backup">نسخ احتياطي JSON</button><label data-i="restore">استعادة نسخة JSON</label><input type="file" id="restoreFile" accept=".json,application/json"></div>
 </section>
 </main>
+<script src="fsrs-engine.js"></script>
 <script>
 const DAY=86400000, KEY="dk1";
 const T={
@@ -62,7 +63,8 @@ function dayKey(){return new Date().toISOString().slice(0,10)}
 function dueCards(d){let n=Date.now();return d.cards.filter(c=>c.due<=n)}
 function fmtDays(n){if(n<1/24)return Math.max(1,Math.round(n*1440))+"m";if(n<1)return Math.round(n*24)+"h";if(n<30)return Math.round(n)+"d";return Math.round(n/30)+"mo"}
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-function renderAll(){renderHome();renderCards();renderActivity()}\nfunction setLanguage(){document.documentElement.lang=S.lang;document.documentElement.dir=S.lang==="ar"?"rtl":"ltr";document.querySelectorAll("[data-i]").forEach(e=>e.textContent=tr(e.dataset.i));["home","review","cards","activity","settings"].forEach(k=>{let b=$("tab-"+k);if(b)b.textContent=tr(k)});$("language").value=S.lang;$("themeSelect").value=S.theme;renderAll()}
+function renderAll(){renderHome();renderCards();renderActivity()}
+function setLanguage(){document.documentElement.lang=S.lang;document.documentElement.dir=S.lang==="ar"?"rtl":"ltr";document.querySelectorAll("[data-i]").forEach(e=>e.textContent=tr(e.dataset.i));["home","review","cards","activity","settings"].forEach(k=>{let b=$("tab-"+k);if(b)b.textContent=tr(k)});$("language").value=S.lang;$("themeSelect").value=S.theme;renderAll()}
 function applyTheme(){if(S.theme==="system")document.documentElement.removeAttribute("data-theme");else document.documentElement.dataset.theme=S.theme}
 function showTab(t){["home","review","cards","activity","settings"].forEach(k=>{$(k).classList.toggle("hide",k!==t);$("tab-"+k).classList.toggle("on",k===t)});if(t==="review")renderReview();if(t==="cards")renderCards();if(t==="home")renderHome();if(t==="activity")renderActivity()}
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
