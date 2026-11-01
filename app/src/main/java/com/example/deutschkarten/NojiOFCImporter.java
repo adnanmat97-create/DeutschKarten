@@ -219,13 +219,13 @@ public final class NojiOFCImporter {
                 String filename = name.substring(name.lastIndexOf('/') + 1);
                 if (filename.isEmpty() || filename.startsWith(".")) { zip.closeEntry(); continue; }
                 ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                int n; byte[] buffer = new byte[16384];
+                int n; byte[] buffer = new byte[16384]; boolean tooLarge = false;
                 while ((n = zip.read(buffer)) != -1) {
-                    if (bytes.size() + n > MAX_ONE_MEDIA) break;
+                    if (bytes.size() + n > MAX_ONE_MEDIA) { tooLarge = true; break; }
                     bytes.write(buffer, 0, n);
                 }
                 byte[] data = bytes.toByteArray();
-                if (data.length > 0 && total + data.length <= MAX_TOTAL_MEDIA) {
+                if (!tooLarge && data.length > 0 && total + data.length <= MAX_TOTAL_MEDIA) {
                     out.put(filename, data); total += data.length;
                 }
                 zip.closeEntry();
