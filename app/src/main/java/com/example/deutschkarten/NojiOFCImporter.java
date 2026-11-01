@@ -51,7 +51,7 @@ public final class NojiOFCImporter {
                 while ((entry = zip.getNextEntry()) != null) {
                     if (++entries > MAX_ENTRIES) throw new Exception("ملف OFC يحتوي عدداً كبيراً جداً من العناصر.");
                     if (entry.isDirectory()) { zip.closeEntry(); continue; }
-                    String name = entry.getName() == null ? "" : entry.getName().replace('\\\\', '/');
+                    String name = entry.getName() == null ? "" : entry.getName().replace('\\', '/');
                     if (name.startsWith("/") || name.contains("../")) { zip.closeEntry(); continue; }
                     String base = name.substring(name.lastIndexOf('/') + 1);
                     boolean isJson = base.equalsIgnoreCase("deck_data.json");
@@ -215,7 +215,7 @@ public final class NojiOFCImporter {
             while ((entry = zip.getNextEntry()) != null) {
                 if (++entries > MAX_ENTRIES) throw new Exception("ملف وسائط OFC يحتوي عناصر كثيرة جداً.");
                 if (entry.isDirectory()) { zip.closeEntry(); continue; }
-                String name = entry.getName() == null ? "" : entry.getName().replace('\\\\', '/');
+                String name = entry.getName() == null ? "" : entry.getName().replace('\\', '/');
                 String filename = name.substring(name.lastIndexOf('/') + 1);
                 if (filename.isEmpty() || filename.startsWith(".")) { zip.closeEntry(); continue; }
                 ByteArrayOutputStream bytes = new ByteArrayOutputStream();
