@@ -171,7 +171,8 @@ public class MainActivity extends Activity {
                 runOnUiThread(() -> {
                     if (webView == null) return;
                     if (payload != null) {
-                        webView.evaluateJavascript("window.onNativeNojiImportResult(" + JSONObject.quote(payload) + ");", null);
+                        String callback = isOfc ? "onNativeNojiImportResult" : "onNativeCsvImportError";
+                        webView.evaluateJavascript("window." + callback + "(" + JSONObject.quote(payload) + ");", null);
                     } else if (csvPayload != null) {
                         webView.evaluateJavascript("window.onNativeCsvFileSelected(" + JSONObject.quote(csvPayload) + "," + JSONObject.quote(name) + ");", null);
                     }
