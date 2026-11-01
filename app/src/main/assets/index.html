@@ -631,9 +631,9 @@ window.onNativeAnkiImportResult=function(payload){
  }
 };
 function parseCSVRows(text){
- const raw=String(text||"").replace(/^\\uFEFF/,"");
- const first=(raw.split(/\\r?\\n/,1)[0]||"");
- const counts={",":0,";":0,"\\t":0};
+ const raw=String(text||"").replace(/^\uFEFF/,"");
+ const first=(raw.split(/\r?\n/,1)[0]||"");
+ const counts={",":0,";":0,"\t":0};
  let quoted=false;
  for(let i=0;i<first.length;i++){const ch=first[i];if(ch==='"'){if(quoted&&first[i+1]==='"'){i++;continue}quoted=!quoted}else if(!quoted&&Object.prototype.hasOwnProperty.call(counts,ch))counts[ch]++}
  const delimiter=Object.keys(counts).sort((a,b)=>counts[b]-counts[a])[0];
@@ -642,8 +642,8 @@ function parseCSVRows(text){
   const ch=raw[i];
   if(ch==='"'){if(inQuotes&&raw[i+1]==='"'){cell+='"';i++}else inQuotes=!inQuotes;continue}
   if(!inQuotes&&ch===delimiter){row.push(cell);cell="";continue}
-  if(!inQuotes&&(ch==="\\n"||ch==="\\r")){
-   if(ch==="\\r"&&raw[i+1]==="\\n")i++;
+  if(!inQuotes&&(ch==="\n"||ch==="\r")){
+   if(ch==="\r"&&raw[i+1]==="\n")i++;
    row.push(cell);if(row.some(v=>String(v).trim()))rows.push(row);row=[];cell="";continue;
   }
   cell+=ch;
@@ -687,7 +687,7 @@ window.onNativeCsvFileSelected=function(text,name){
  try{const result=importCSVText(text,name);$("csvFileStatus").textContent=name+": "+messageText("csvImportDone",{cards:result.count,deck:result.deck})}
  catch(error){$("csvFileStatus").textContent=error.message||tr("csvImportError")}
 };
-$("exportBtn").onclick=()=>{let rows=[["German","Meaning","Example"],...deck().cards.map(c=>[c.de,c.ar,c.ex])];download("deutschkarten.csv",rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(";")).join("\\n"),"text/csv")};
+$("exportBtn").onclick=()=>{let rows=[["German","Meaning","Example"],...deck().cards.map(c=>[c.de,c.ar,c.ex])];download("deutschkarten.csv",rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(";")).join("\n"),"text/csv")};
 function messageText(key,values){let text=tr(key);Object.keys(values||{}).forEach(k=>{text=text.replace("{"+k+"}",String(values[k]))});return text}
 $("importNojiBtn").onclick=()=>{
  if(window.AndroidAnkiBridge?.importNojiOFC){$("nojiImportStatus").textContent=tr("nojiImportWaiting");window.AndroidAnkiBridge.importNojiOFC()}
