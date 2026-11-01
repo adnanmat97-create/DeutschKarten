@@ -193,16 +193,7 @@ public final class AnkiPackageImporter {
                 long noteCount = valid ? scalar(db, "SELECT count(*) FROM notes") : 0;
                 db.close();
                 if (valid && noteCount > 0) {
-                    if (name.endsWith(".anki21b")) {
-                        File actual = new File(work, "collection-import.sqlite");
-                        if (!test.equals(actual)) {
-                            try (InputStream in = new FileInputStream(test);
-                                 OutputStream out = new FileOutputStream(actual)) {
-                                copyLimited(in, out, MAX_UNPACKED_BYTES);
-                            }
-                        }
-                        return actual;
-                    }
+                    if (name.endsWith(".anki21b")) return candidate;
                     return candidate;
                 }
             } catch (Throwable ignored) {}
@@ -236,7 +227,7 @@ public final class AnkiPackageImporter {
 
             Map<Long, String> deckNames = readDeckNames(db, legacyDecks);
             Map<Long, List<String>> fieldNames = readFieldNames(db, legacyModels);
-            Map<Long, String> modelNames = readModelNames(legacyModels);
+            Map<Long, String> modelNames = readModelNames(db, legacyModels);
             Map<String, MediaInfo> mediaFiles = new HashMap<>();
             JSONArray outDecks = new JSONArray();
             Map<String, JSONObject> outputByDeck = new HashMap<>();
@@ -415,15 +406,21 @@ public final class AnkiPackageImporter {
         return result;
     }
 
-    private static Map<Long, String> readModelNames(JSONObject legacyModels) {
+    private static Map<Long, String> readModelNames(SQLiteDatabase db, JSONObject legacyModels) {
         Map<Long, String> result = new HashMap<>();
-        if (legacyModels == null) return result;
-        Iterator<String> keys = legacyModels.keys();
-        while (keys.hasNext()) {
-            String key = keys.next();
-            JSONObject model = legacyModels.optJSONObject(key);
-            try { if (model != null) result.put(Long.parseLong(key), model.optString("name", "")); }
-            catch (Throwable ignored) {}
+        if (legacyModels != null) {
+            Iterator<String> keys = legacyModels.keys();
+            while (keys.hasNext()) {
+                String key = keys.next();
+                JSONObject model = legacyModels.optJSONObject(key);
+                try { if (model != null) result.put(Long.parseLong(key), model.optString("name", "")); }
+                catch (Throwable ignored) {}
+            }
+        }
+        if (tableExists(db, "notetypes")) {
+            try (Cursor c = db.rawQuery("SELECT id, name FROM notetypes", null)) {
+                while (c.moveToNext()) result.put(c.getLong(0), c.getString(1));
+            } catch (Throwable ignored) {}
         }
         return result;
     }
