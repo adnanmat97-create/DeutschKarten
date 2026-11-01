@@ -201,8 +201,8 @@ public final class NojiOFCImporter {
 
     private static String htmlToText(String value) {
         if (value == null) return "";
-        String normalized = value.replaceAll("(?i)<br\\s*/?>", "\\n")
-                .replaceAll("(?i)</(p|div|li|h[1-6])\\s*>", "\\n");
+        String normalized = value.replaceAll("(?i)<br\\s*/?>", "\n")
+                .replaceAll("(?i)</(p|div|li|h[1-6])\\s*>", "\n");
         return Html.fromHtml(normalized).toString().trim();
     }
 
