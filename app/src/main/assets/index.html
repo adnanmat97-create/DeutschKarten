@@ -1,156 +1,96 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>بطاقات الألمانية</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>DeutschKarten</title>
 <style>
-:root{--bg:#f6f5f1;--sf:#fff;--tx:#1d1d1b;--mu:#6b6a65;--ac:#1f6f5c;--acx:#fff;--bd:#dedcd4;--rd:#c0392b;--or:#d98324;--gn:#2e8b57;--bl:#2f6fb5;
-box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161615;--sf:#22221f;--tx:#efeee9;--mu:#a09e96;--ac:#4fb59c;--acx:#0f1f1b;--bd:#37362f}}
-:root[data-theme="dark"]{--bg:#161615;--sf:#22221f;--tx:#efeee9;--mu:#a09e96;--ac:#4fb59c;--acx:#0f1f1b;--bd:#37362f}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;line-height:1.5}
-main{max-width:520px;margin:0 auto;padding:16px}
-nav{display:flex;gap:6px;margin-bottom:14px}
-nav button{flex:1;padding:10px;border:1px solid var(--bd);background:var(--sf);color:var(--tx);border-radius:10px;font-size:15px;cursor:pointer}
-nav button.on{background:var(--ac);color:var(--acx);border-color:var(--ac)}
-.card{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:28px 18px;text-align:center;min-height:230px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px}
-.de{font-size:34px;font-weight:700;direction:ltr}
-.ar{font-size:26px}
-.ex{font-size:17px;color:var(--mu);direction:ltr}
-.meta{display:flex;justify-content:space-between;color:var(--mu);font-size:14px;margin-bottom:8px}
-button.sp{border:none;background:var(--ac);color:var(--acx);width:56px;height:56px;border-radius:50%;font-size:24px;cursor:pointer}
-button.main{width:100%;margin-top:12px;padding:14px;border:none;border-radius:12px;background:var(--ac);color:var(--acx);font-size:17px;cursor:pointer}
-.rate{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px}
-.rate button{padding:12px 2px;border:none;border-radius:10px;color:#fff;font-size:14px;cursor:pointer}
-.rate small{display:block;opacity:.85;font-size:11px}
-input,textarea,select{width:100%;padding:10px;margin:4px 0 8px;border:1px solid var(--bd);border-radius:8px;background:var(--sf);color:var(--tx);font-size:16px;font-family:inherit}
-h3{margin:18px 0 6px;font-size:17px}
-.row{display:flex;align-items:center;gap:8px;background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:8px 10px;margin-bottom:6px}
-.row .t{flex:1;min-width:0}.row b{direction:ltr;display:inline-block}
-.row button{border:none;background:none;font-size:18px;cursor:pointer;color:var(--tx)}
-.hint{color:var(--mu);font-size:14px}
-.warn{background:#fff3cd;color:#664d03;padding:8px 12px;border-radius:8px;font-size:14px;margin-bottom:10px}
-.hide{display:none}
-</style>
-</head>
-<body>
-<main>
-<nav>
-<button id="t1" class="on">مراجعة</button>
-<button id="t2">البطاقات</button>
-<button id="t3">إعدادات</button>
-</nav>
-<div id="warn" class="warn hide">لم يُعثر على صوت ألماني في جهازك. ثبّت صوت German من إعدادات النظام (تحويل النص إلى كلام).</div>
-
-<section id="p1">
-<div class="meta"><span id="cnt"></span><span id="tot"></span></div>
-<div id="stage"></div>
+:root{--bg:#f5f4ef;--sf:#fff;--tx:#20211f;--mu:#777970;--ac:#267461;--acx:#fff;--bd:#e2e0d8;--red:#bd5147;--orange:#c8872d;--green:#39845d;--blue:#3974b8}
+:root[data-theme=dark]{--bg:#171917;--sf:#242824;--tx:#f0f1ec;--mu:#a8ada4;--ac:#62b59b;--acx:#10251d;--bd:#3a403a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;line-height:1.5}main{max-width:620px;margin:auto;padding:14px 14px 28px}
+header{display:flex;align-items:center;justify-content:space-between;margin:2px 2px 14px}header strong{font-size:21px}header button,.iconbtn{border:1px solid var(--bd);background:var(--sf);color:var(--tx);border-radius:10px;padding:8px 11px}
+nav{display:flex;gap:6px;margin-bottom:14px}nav button{flex:1;border:1px solid var(--bd);background:var(--sf);color:var(--tx);border-radius:11px;padding:10px 4px;font-size:14px}nav button.on,.primary{background:var(--ac)!important;color:var(--acx)!important;border-color:var(--ac)!important}
+.panel,.card,.deck{background:var(--sf);border:1px solid var(--bd);border-radius:15px;padding:14px;margin-bottom:10px}.deck{display:flex;gap:10px;align-items:center}.deck .grow{flex:1;min-width:0}.deck h3{margin:0;font-size:17px}.muted,.hint{color:var(--mu);font-size:13px}.progress{height:7px;border-radius:9px;background:var(--bd);overflow:hidden;margin-top:8px}.progress i{display:block;height:100%;background:var(--ac)}
+button{cursor:pointer;font:inherit}button.primary,.wide{width:100%;border:0;border-radius:11px;padding:12px;margin:5px 0}.secondary{border:1px solid var(--bd);background:var(--sf);color:var(--tx);border-radius:10px;padding:9px 11px}.danger{background:var(--red)!important;color:white!important}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.stat{background:var(--bg);padding:10px;border-radius:10px;text-align:center}.stat b{display:block;font-size:20px}
+input,textarea,select{width:100%;padding:11px;margin:4px 0 9px;border:1px solid var(--bd);border-radius:9px;background:var(--sf);color:var(--tx);font:inherit}input[type=checkbox]{width:auto;margin-inline-end:7px}label{display:block;font-size:13px;color:var(--mu);margin-top:7px}
+.row{display:flex;align-items:center;gap:8px;padding:9px;border-bottom:1px solid var(--bd)}.row .grow{flex:1;min-width:0}.row b{direction:ltr;display:inline-block}.row button{border:0;background:transparent;color:var(--tx);padding:5px}
+.card{min-height:245px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:13px;padding:25px}.word{font-size:32px;font-weight:750;direction:ltr}.meaning{font-size:24px}.example{direction:ltr;color:var(--mu);font-size:16px}.speaker{border:0;background:var(--ac);color:var(--acx);border-radius:50%;width:46px;height:46px;font-size:21px}
+.rate{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.rate button{border:0;color:#fff;border-radius:10px;padding:10px 2px;font-size:14px}.rate small{display:block;font-size:11px;opacity:.9}.again{background:var(--red)}.hard{background:var(--orange)}.good{background:var(--green)}.easy{background:var(--blue)}
+.hide{display:none!important}.topline{display:flex;justify-content:space-between;color:var(--mu);font-size:13px;margin:5px 2px 9px}.pill{font-size:12px;background:var(--bg);padding:4px 8px;border-radius:20px}.actions{display:flex;gap:6px;flex-wrap:wrap}.actions>*{flex:1}
+</style></head>
+<body><main>
+<header><strong>📚 DeutschKarten</strong><button id="theme">◐</button></header>
+<nav><button id="tab-home" class="on" data-tab="home">الرئيسية</button><button id="tab-review" data-tab="review">مراجعة</button><button id="tab-cards" data-tab="cards">البطاقات</button><button id="tab-settings" data-tab="settings">إعدادات</button></nav>
+<section id="home">
+<div class="panel"><div class="topline"><span id="welcome">مساحة تعلمك</span><span id="streak">🔥 0</span></div><div class="grid"><div class="stat"><b id="dueHome">0</b><span class="muted" data-i="due">للمراجعة</span></div><div class="stat"><b id="newHome">0</b><span class="muted" data-i="new">جديدة</span></div><div class="stat"><b id="masterHome">0</b><span class="muted" data-i="mastered">متقنة</span></div><div class="stat"><b id="totalHome">0</b><span class="muted" data-i="total">كل البطاقات</span></div></div></div>
+<div class="topline"><b data-i="decks">مجموعاتي</b><button class="secondary" id="newDeck">＋ مجموعة</button></div><div id="decks"></div>
 </section>
-
-<section id="p2" class="hide">
-<h3>بطاقة جديدة</h3>
-<input id="nde" lang="de" dir="ltr" placeholder="Wort, z. B. die Begleitung">
-<input id="nar" placeholder="المعنى بالعربية">
-<input id="nex" lang="de" dir="ltr" placeholder="Beispielsatz (اختياري)">
-<button class="main" id="add">إضافة</button>
-<h3>استيراد من ملف CSV</h3>
-<p class="hint">كل سطر: ألماني;عربي;مثال. افصل بفاصلة منقوطة أو فاصلة أو Tab.</p>
-<textarea id="csv" rows="4" dir="ltr" placeholder="der Termin;الموعد;Ich habe morgen einen Termin."></textarea>
-<button class="main" id="imp">استيراد</button>
-<h3>كل البطاقات (<span id="n"></span>)</h3>
-<div id="list"></div>
+<section id="review" class="hide"><div class="topline"><span id="reviewDeckName">مراجعة</span><span id="reviewCount"></span></div><div id="reviewStage"></div></section>
+<section id="cards" class="hide">
+<div class="panel"><b data-i="addCard">إضافة بطاقة</b><label data-i="deck">المجموعة</label><select id="cardDeck"></select><input id="word" dir="ltr" placeholder="Wort / Ausdruck"><input id="meaning" placeholder="المعنى"><input id="example" dir="ltr" placeholder="Beispielsatz (optional)"><button class="primary" id="addCardBtn" data-i="add">إضافة</button></div>
+<div class="panel"><b data-i="import">استيراد CSV</b><p class="hint" data-i="csvHint">كل سطر: ألماني;المعنى;مثال</p><textarea id="csv" rows="3" dir="ltr"></textarea><button class="secondary wide" id="importBtn">استيراد</button><button class="secondary wide" id="exportBtn">تصدير CSV</button></div>
+<div class="panel"><div class="topline"><b data-i="allCards">كل البطاقات</b><select id="filterDeck" style="width:auto;margin:0"></select></div><div id="cardList"></div></div>
 </section>
-
-<section id="p3" class="hide">
-<h3>الصوت</h3>
-<label class="hint">الصوت الألماني</label>
-<select id="voice"></select>
-<label class="hint">سرعة النطق: <span id="rv"></span></label>
-<input type="range" id="rate" min="0.5" max="1.2" step="0.05">
-<label class="hint"><input type="checkbox" id="auto" style="width:auto;margin:0 0 0 6px"> نطق تلقائي عند ظهور الكلمة</label>
-<button class="main" id="test">تجربة الصوت</button>
-<h3>البيانات</h3>
-<button class="main" id="reset" style="background:var(--rd)">حذف كل البطاقات وإعادة البداية</button>
+<section id="settings" class="hide">
+<div class="panel"><b data-i="general">عام</b><label data-i="interface">لغة الواجهة</label><select id="language"><option value="ar">العربية</option><option value="de">Deutsch</option><option value="en">English</option><option value="fr">Français</option></select><label data-i="theme">المظهر</label><select id="themeSelect"><option value="system">تلقائي</option><option value="light">فاتح</option><option value="dark">داكن</option></select></div>
+<div class="panel"><b data-i="speech">النطق الألماني</b><label data-i="voice">الصوت</label><select id="voice"></select><label data-i="speed">سرعة النطق</label><input type="range" id="speed" min=".5" max="1.2" step=".05"><label><input type="checkbox" id="autoSpeak"> <span data-i="autoSpeak">النطق التلقائي</span></label><button class="secondary wide" id="testVoice" data-i="test">تجربة الصوت</button><p class="hint" id="voiceHint"></p></div>
+<div class="panel"><b data-i="data">البيانات</b><button class="secondary wide" id="backupBtn" data-i="backup">نسخ احتياطي JSON</button><label data-i="restore">استعادة نسخة JSON</label><input type="file" id="restoreFile" accept=".json,application/json"></div>
 </section>
 </main>
-
 <script>
-const DAY=86400000;
+const DAY=86400000, KEY="dk1";
+const T={
+ar:{home:"الرئيسية",review:"مراجعة",cards:"البطاقات",settings:"إعدادات",due:"للمراجعة",new:"جديدة",mastered:"متقنة",total:"كل البطاقات",decks:"مجموعاتي",addCard:"إضافة بطاقة",deck:"المجموعة",add:"إضافة",import:"استيراد CSV",csvHint:"كل سطر: ألماني;المعنى;مثال",allCards:"كل البطاقات",general:"عام",interface:"لغة الواجهة",theme:"المظهر",speech:"النطق الألماني",voice:"الصوت",speed:"سرعة النطق",autoSpeak:"النطق التلقائي",test:"تجربة الصوت",data:"البيانات",backup:"نسخ احتياطي JSON",restore:"استعادة نسخة JSON",newDeck:"اسم المجموعة الجديدة",algorithm:"خوارزمية التكرار",newDay:"بطاقات جديدة يومياً",maxDay:"الحد الأقصى للمراجعة يومياً",shuffle:"خلط البطاقات",advanced:"إعدادات متقدمة",start:"ابدأ المراجعة",show:"إظهار الإجابة",again:"مرة أخرى",hard:"صعب",good:"جيد",easy:"سهل",empty:"لا توجد بطاقات مستحقة الآن",all:"كل المجموعات",remove:"حذف",rename:"تغيير الاسم",save:"حفظ",cardsCount:"بطاقة",quick:"مراجعة سريعة",generalAlgo:"تكرار منتظم",rw:"تعلم اللغات (RW)",fsrs:"التكرار الذكي (FSRS)",stats:"الإحصائيات",today:"اليوم",confirmDelete:"حذف هذه المجموعة وكل بطاقاتها؟",front:"الكلمة",back:"المعنى"},
+de:{home:"Start",review:"Lernen",cards:"Karten",settings:"Einstellungen",due:"Fällig",new:"Neu",mastered:"Gemeistert",total:"Karten gesamt",decks:"Meine Stapel",addCard:"Karte hinzufügen",deck:"Stapel",add:"Hinzufügen",import:"CSV importieren",csvHint:"Eine Zeile: Deutsch;Bedeutung;Beispiel",allCards:"Alle Karten",general:"Allgemein",interface:"App-Sprache",theme:"Design",speech:"Deutsche Sprachausgabe",voice:"Stimme",speed:"Sprechtempo",autoSpeak:"Automatisch vorlesen",test:"Stimme testen",data:"Daten",backup:"JSON sichern",restore:"JSON wiederherstellen",newDeck:"Name des Stapels",algorithm:"Wiederholungsalgorithmus",newDay:"Neue Karten pro Tag",maxDay:"Max. Wiederholungen pro Tag",shuffle:"Karten mischen",advanced:"Erweiterte Einstellungen",start:"Lernen starten",show:"Antwort zeigen",again:"Nochmal",hard:"Schwer",good:"Gut",easy:"Einfach",empty:"Keine Karten fällig",all:"Alle Stapel",remove:"Löschen",rename:"Umbenennen",save:"Speichern",cardsCount:"Karten",quick:"Schnelle Wiederholung",generalAlgo:"Regelmäßige Wiederholung",rw:"Sprachen lernen (RW)",fsrs:"Intelligentes Spaced Repetition (FSRS)",stats:"Statistik",today:"Heute",confirmDelete:"Diesen Stapel und alle Karten löschen?",front:"Vorderseite",back:"Rückseite"},
+en:{home:"Home",review:"Review",cards:"Cards",settings:"Settings",due:"Due",new:"New",mastered:"Mastered",total:"Total cards",decks:"My decks",addCard:"Add a card",deck:"Deck",add:"Add",import:"Import CSV",csvHint:"One line: German;meaning;example",allCards:"All cards",general:"General",interface:"Interface language",theme:"Appearance",speech:"German speech",voice:"Voice",speed:"Speech rate",autoSpeak:"Speak automatically",test:"Test voice",data:"Data",backup:"Export JSON backup",restore:"Restore JSON backup",newDeck:"New deck name",algorithm:"Review algorithm",newDay:"New cards per day",maxDay:"Maximum reviews per day",shuffle:"Shuffle cards",advanced:"Advanced settings",start:"Start review",show:"Reveal answer",again:"Again",hard:"Hard",good:"Good",easy:"Easy",empty:"No cards due right now",all:"All decks",remove:"Delete",rename:"Rename",save:"Save",cardsCount:"cards",quick:"Quick review",generalAlgo:"Regular repetition",rw:"Language learning (RW)",fsrs:"Intelligent Spaced Repetition (FSRS)",stats:"Statistics",today:"Today",confirmDelete:"Delete this deck and all its cards?",front:"Front",back:"Back"},
+fr:{home:"Accueil",review:"Révision",cards:"Cartes",settings:"Paramètres",due:"À réviser",new:"Nouvelles",mastered:"Maîtrisées",total:"Total",decks:"Mes paquets",addCard:"Ajouter une carte",deck:"Paquet",add:"Ajouter",import:"Importer CSV",csvHint:"Une ligne : allemand;sens;exemple",allCards:"Toutes les cartes",general:"Général",interface:"Langue de l’application",theme:"Apparence",speech:"Voix allemande",voice:"Voix",speed:"Vitesse",autoSpeak:"Lecture automatique",test:"Tester la voix",data:"Données",backup:"Sauvegarde JSON",restore:"Restaurer JSON",newDeck:"Nom du paquet",algorithm:"Algorithme de révision",newDay:"Nouvelles cartes par jour",maxDay:"Révisions max par jour",shuffle:"Mélanger les cartes",advanced:"Paramètres avancés",start:"Commencer",show:"Afficher la réponse",again:"Encore",hard:"Difficile",good:"Bien",easy:"Facile",empty:"Aucune carte à réviser",all:"Tous les paquets",remove:"Supprimer",rename:"Renommer",save:"Enregistrer",cardsCount:"cartes",quick:"Révision rapide",generalAlgo:"Répétition régulière",rw:"Apprentissage des langues (RW)",fsrs:"Répétition intelligente (FSRS)",stats:"Statistiques",today:"Aujourd’hui",confirmDelete:"Supprimer ce paquet et toutes ses cartes?",front:"Recto",back:"Verso"}
+};
 const SEED=[["der Termin","الموعد","Ich habe morgen einen Termin beim Arzt."],["die Begleitung","المرافقة","Die Begleitung im Unterricht ist wichtig."],["die Bewerbung","طلب التوظيف","Ich schreibe heute meine Bewerbung."],["der Ausbildungsplatz","مقعد التدريب المهني","Ich suche einen Ausbildungsplatz in Stuttgart."],["die Erfahrung","الخبرة","Ich habe Erfahrung im Lager."],["zuverlässig","موثوق","Er ist ein zuverlässiger Mitarbeiter."],["die Unterstützung","الدعم","Das Kind braucht Unterstützung im Alltag."],["sich vorstellen","يقدّم نفسه","Ich möchte mich kurz vorstellen."],["die Zusammenarbeit","التعاون","Die Zusammenarbeit mit dem Team klappt gut."],["der Lebenslauf","السيرة الذاتية","Bitte schicken Sie Ihren Lebenslauf."]];
-let S={cards:[],rate:0.85,auto:true,voice:""};
-let cur=null,shown=false,voices=[];
-const $=id=>document.getElementById(id);
-function load(){try{const r=localStorage.getItem("dk1");if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
-if(!S.cards.length)S.cards=SEED.map(mk)}
-function save(){try{localStorage.setItem("dk1",JSON.stringify(S))}catch(e){}}
-function mk(a){return{id:Date.now()+Math.random(),de:a[0],ar:a[1],ex:a[2]||"",due:0,int:0,ease:2.5,reps:0}}
-function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
-
-function loadVoices(){voices=(window.speechSynthesis?speechSynthesis.getVoices():[]).filter(v=>v.lang.toLowerCase().startsWith("de"));
-const sel=$("voice");sel.innerHTML=voices.map(v=>`<option value="${esc(v.name)}">${esc(v.name)} (${esc(v.lang)})</option>`).join("");
-if(S.voice)sel.value=S.voice;
-$("warn").classList.toggle("hide",voices.length>0)}
-function speak(t){if(!window.speechSynthesis||!t)return;speechSynthesis.cancel();
-const u=new SpeechSynthesisUtterance(t);u.lang="de-DE";u.rate=S.rate;
-const v=voices.find(v=>v.name===S.voice)||voices[0];if(v)u.voice=v;speechSynthesis.speak(u)}
-
-function queue(){const n=Date.now();return S.cards.filter(c=>c.due<=n).sort((a,b)=>a.due-b.due)}
-function fmt(d){if(d<1/1440*1.5)return"دقيقة";if(d<1)return Math.round(d*1440)+" د";if(d<30)return Math.round(d)+" ي";return Math.round(d/30)+" ش"}
-function nextInt(c,q){const r=c.reps;
-if(q===0)return 1/1440;
-if(q===1)return Math.max(1,(c.int||1)*1.2);
-if(q===2)return r===0?1:r===1?3:Math.max(1,c.int*c.ease);
-return r===0?4:Math.max(4,(c.int||1)*c.ease*1.3)}
-
-function render(){const q=queue();$("cnt").textContent="للمراجعة الآن: "+q.length;$("tot").textContent="المجموع: "+S.cards.length;
-const st=$("stage");
-if(!q.length){cur=null;const nx=S.cards.map(c=>c.due).sort((a,b)=>a-b)[0];
-const w=nx?Math.max(1,Math.ceil((nx-Date.now())/60000)):0;
-st.innerHTML=`<div class="card"><div class="ar">أحسنت! لا توجد بطاقات الآن</div><div class="hint">${w?"البطاقة التالية بعد حوالي "+(w<90?w+" دقيقة":Math.round(w/60)+" ساعة"):"أضف بطاقات من تبويب البطاقات"}</div></div>`;return}
-if(!cur||!q.includes(cur)){cur=q[0];shown=false}
-const c=cur;
-st.innerHTML=`<div class="card"><div class="de" lang="de">${esc(c.de)}</div>
-<button class="sp" id="spk" aria-label="نطق">🔊</button>
-${shown?`<div class="ar">${esc(c.ar)}</div>${c.ex?`<div class="ex" lang="de">${esc(c.ex)}</div><button class="sp" id="spx" style="width:40px;height:40px;font-size:17px" aria-label="نطق الجملة">🔊</button>`:""}`:""}</div>
-${shown?`<div class="rate">
-<button style="background:var(--rd)" data-q="0">نسيت<small>${fmt(nextInt(c,0))}</small></button>
-<button style="background:var(--or)" data-q="1">صعب<small>${fmt(nextInt(c,1))}</small></button>
-<button style="background:var(--gn)" data-q="2">جيد<small>${fmt(nextInt(c,2))}</small></button>
-<button style="background:var(--bl)" data-q="3">سهل<small>${fmt(nextInt(c,3))}</small></button></div>`:`<button class="main" id="show">إظهار المعنى</button>`}`;
-$("spk").onclick=()=>speak(c.de);
-if($("spx"))$("spx").onclick=()=>speak(c.ex);
-if($("show"))$("show").onclick=()=>{shown=true;render();speak(c.de)};
-st.querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>rate(+b.dataset.q));
-}
-function rate(q){const c=cur;const d=nextInt(c,q);
-if(q===0){c.ease=Math.max(1.3,c.ease-0.2);c.reps=0}else{if(q===1)c.ease=Math.max(1.3,c.ease-0.15);if(q===3)c.ease+=0.1;c.reps++}
-c.int=q===0?0:d;c.due=Date.now()+d*DAY;save();cur=null;shown=false;render();
-if(cur&&S.auto)speak(cur.de)}
-
-function renderList(){$("n").textContent=S.cards.length;
-$("list").innerHTML=S.cards.map(c=>`<div class="row"><button data-s="${c.id}" aria-label="نطق">🔊</button><div class="t"><b lang="de">${esc(c.de)}</b> · ${esc(c.ar)}</div><button data-d="${c.id}" aria-label="حذف">🗑️</button></div>`).join("");
-$("list").querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>speak(S.cards.find(c=>c.id==b.dataset.s).de));
-$("list").querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>{S.cards=S.cards.filter(c=>c.id!=b.dataset.d);save();renderList()})}
-
-function tab(i){["1","2","3"].forEach(k=>{$("p"+k).classList.toggle("hide",k!=i);$("t"+k).classList.toggle("on",k==i)});
-if(i==1){render();if(cur&&S.auto)speak(cur.de)}if(i==2)renderList()}
-["1","2","3"].forEach(k=>$("t"+k).onclick=()=>tab(k));
-
-$("add").onclick=()=>{const d=$("nde").value.trim(),a=$("nar").value.trim();if(!d||!a)return;
-S.cards.unshift(mk([d,a,$("nex").value.trim()]));save();["nde","nar","nex"].forEach(k=>$(k).value="");renderList()};
-$("imp").onclick=()=>{const rows=$("csv").value.split("\n").map(l=>l.split(/[;\t,]/).map(s=>s.trim())).filter(r=>r[0]&&r[1]);
-rows.forEach(r=>S.cards.unshift(mk(r)));save();$("csv").value="";renderList()};
-$("voice").onchange=e=>{S.voice=e.target.value;save()};
-$("rate").oninput=e=>{S.rate=+e.target.value;$("rv").textContent=S.rate;save()};
-$("auto").onchange=e=>{S.auto=e.target.checked;save()};
-$("test").onclick=()=>speak("Guten Tag, ich möchte mich kurz vorstellen.");
-$("reset").onclick=()=>{if(confirm("هل أنت متأكد؟")){S.cards=SEED.map(mk);save();renderList();cur=null}};
-
-load();$("rate").value=S.rate;$("rv").textContent=S.rate;$("auto").checked=S.auto;
-loadVoices();if(window.speechSynthesis)speechSynthesis.onvoiceschanged=loadVoices;
-render();
-</script>
-</body>
-</html>
+let S={decks:[],lang:"ar",theme:"system",rate:.85,autoSpeak:true,voice:"",streak:0,lastStudy:"",studyDays:[]},activeDeck=null,cur=null,revealed=false,voices=[];
+const $=id=>document.getElementById(id), tr=k=>(T[S.lang]||T.ar)[k]||k, uid=()=>Date.now()+Math.random();
+function defaultDeck(){return{id:uid(),name:"Deutsch B1",algorithm:"fsrs",newPerDay:20,maxPerDay:100,shuffle:false,cards:[]}}
+function card(a){return{id:uid(),de:a[0]||"",ar:a[1]||"",ex:a[2]||"",due:0,interval:0,ease:2.5,reps:0,stability:0,difficulty:5,last:0,state:"new",seenDay:""}}
+function migrate(){try{let old=JSON.parse(localStorage.getItem(KEY)||"null");if(old){S={...S,...old};if(!Array.isArray(S.decks)){let d=defaultDeck();d.cards=(old.cards||SEED.map(card)).map(c=>({...card([c.de,c.ar,c.ex]),...c}));S.decks=[d]}else S.decks=S.decks.map(d=>({...defaultDeck(),...d,cards:(d.cards||[]).map(c=>({...card([c.de,c.ar,c.ex]),...c}))}));}}catch(e){}if(!S.decks?.length){let d=defaultDeck();d.cards=SEED.map(card);S.decks=[d]}activeDeck=S.decks[0].id;save()}
+function save(){localStorage.setItem(KEY,JSON.stringify(S))}
+function deck(){return S.decks.find(d=>d.id===activeDeck)||S.decks[0]}
+function allCards(){return S.decks.flatMap(d=>d.cards)}
+function dayKey(){return new Date().toISOString().slice(0,10)}
+function dueCards(d){let n=Date.now();return d.cards.filter(c=>c.due<=n)}
+function fmtDays(n){if(n<1/24)return Math.max(1,Math.round(n*1440))+"m";if(n<1)return Math.round(n*24)+"h";if(n<30)return Math.round(n)+"d";return Math.round(n/30)+"mo"}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function setLanguage(){document.documentElement.lang=S.lang;document.documentElement.dir=S.lang==="ar"?"rtl":"ltr";document.querySelectorAll("[data-i]").forEach(e=>e.textContent=tr(e.dataset.i));["home","review","cards","settings"].forEach(k=>{let b=$("tab-"+k);if(b)b.textContent=tr(k)});$("language").value=S.lang;$("themeSelect").value=S.theme;renderAll()}
+function applyTheme(){if(S.theme==="system")document.documentElement.removeAttribute("data-theme");else document.documentElement.dataset.theme=S.theme}
+function showTab(t){["home","review","cards","settings"].forEach(k=>{$(k).classList.toggle("hide",k!==t);$("tab-"+k).classList.toggle("on",k===t)});if(t==="review")renderReview();if(t==="cards")renderCards();if(t==="home")renderHome()}
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
+$("theme").onclick=()=>{$("themeSelect").value=S.theme==="dark"?"light":"dark";S.theme=$("themeSelect").value;applyTheme();save()};
+$("themeSelect").onchange=e=>{S.theme=e.target.value;applyTheme();save()};
+$("language").onchange=e=>{S.lang=e.target.value;save();setLanguage()};
+function renderHome(){let cs=allCards(),now=Date.now();$("dueHome").textContent=cs.filter(c=>c.due<=now&&c.state!=="new").length;$("newHome").textContent=cs.filter(c=>c.state==="new").length;$("masterHome").textContent=cs.filter(c=>c.state==="mastered").length;$("totalHome").textContent=cs.length;$("streak").textContent="🔥 "+(S.streak||0);
+$("decks").innerHTML=S.decks.map(d=>{let n=d.cards.length,done=d.cards.filter(c=>c.state==="mastered").length,due=dueCards(d).length,p=n?Math.round(done/n*100):0;return '<div class="deck"><div class="grow"><h3>'+esc(d.name)+'</h3><div class="muted">'+n+' '+tr("cardsCount")+' · '+due+' '+tr("due")+' · '+p+'%</div><div class="progress"><i style="width:'+p+'%"></i></div><div class="muted">'+tr(d.algorithm==="fsrs"?"fsrs":d.algorithm==="quick"?"quick":d.algorithm==="general"?"generalAlgo":"rw")+'</div></div><button class="secondary" data-open="'+d.id+'">'+tr("start")+'</button><button class="secondary" data-edit="'+d.id+'">⚙</button></div>'}).join("");
+$("decks").querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{activeDeck=+b.dataset.open;showTab("review")});$("decks").querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>editDeck(+b.dataset.edit))}
+function renderDeckSelect(){let opts=S.decks.map(d=>'<option value="'+d.id+'">'+esc(d.name)+'</option>').join("");$("cardDeck").innerHTML=opts;$("filterDeck").innerHTML='<option value="all">'+tr("all")+'</option>'+opts;$("cardDeck").value=activeDeck}
+function renderCards(){renderDeckSelect();let f=$("filterDeck").value||"all",ds=f==="all"?S.decks:S.decks.filter(d=>d.id==f);let cs=ds.flatMap(d=>d.cards.map(c=>({...c,_deck:d.name,_did:d.id})));$("cardList").innerHTML=cs.map(c=>'<div class="row"><div class="grow"><b>'+esc(c.de)+'</b><div class="muted">'+esc(c.ar)+' · '+esc(c._deck)+'</div></div><button data-edit-card="'+c.id+'" data-deck="'+c._did+'">✎</button><button data-del-card="'+c.id+'" data-deck="'+c._did+'">🗑</button></div>').join("")||'<p class="muted">—</p>';
+$("cardList").querySelectorAll("[data-del-card]").forEach(b=>b.onclick=()=>{let d=S.decks.find(x=>x.id==b.dataset.deck);d.cards=d.cards.filter(c=>c.id!=b.dataset.delCard);save();renderCards();renderHome()});$("cardList").querySelectorAll("[data-edit-card]").forEach(b=>b.onclick=()=>editCard(+b.dataset.deck,+b.dataset.editCard))}
+$("filterDeck").onchange=renderCards;
+$("addCardBtn").onclick=()=>{let d=S.decks.find(x=>x.id==$("cardDeck").value),w=$("word").value.trim(),m=$("meaning").value.trim();if(!w||!m)return;d.cards.unshift(card([w,m,$("example").value.trim()]));["word","meaning","example"].forEach(k=>$(k).value="");save();renderCards();renderHome()};
+function editCard(did,cid){let d=S.decks.find(x=>x.id===did),c=d.cards.find(x=>x.id===cid);let w=prompt(tr("front"),c.de);if(w===null)return;let m=prompt(tr("back"),c.ar);if(m===null)return;c.de=w;c.ar=m;c.ex=prompt("Beispiel",c.ex)||"";save();renderCards()}
+function editDeck(id){let d=S.decks.find(x=>x.id===id);let name=prompt(tr("rename"),d.name);if(name===null)return;if(name.trim())d.name=name.trim();let alg=prompt("Algorithmus: fsrs / quick / general / rw",d.algorithm);if(alg&&["fsrs","quick","general","rw"].includes(alg))d.algorithm=alg;let np=prompt(tr("newDay"),d.newPerDay);if(np!==null&&Number.isFinite(+np))d.newPerDay=Math.max(0,+np);let mp=prompt(tr("maxDay"),d.maxPerDay);if(mp!==null&&Number.isFinite(+mp))d.maxPerDay=Math.max(1,+mp);d.shuffle=confirm(tr("shuffle")+"?");save();renderHome()}
+$("newDeck").onclick=()=>{let n=prompt(tr("newDeck"));if(!n?.trim())return;let d=defaultDeck();d.name=n.trim();d.cards=[];S.decks.push(d);activeDeck=d.id;save();renderHome();renderCards()};
+function pickQueue(d){let due=dueCards(d),newCards=d.cards.filter(c=>c.state==="new");let today=dayKey(),newDone=d.cards.filter(c=>c.seenDay===today&&c.state!=="new").length;newCards=newCards.slice(0,Math.max(0,d.newPerDay-newDone));let queue=due.filter(c=>c.state!=="new").slice(0,d.maxPerDay).concat(newCards);if(d.shuffle)queue.sort(()=>Math.random()-.5);else queue.sort((a,b)=>a.due-b.due);return queue}
+function renderReview(){let d=deck();if(!d)return;$("reviewDeckName").textContent=d.name;$("reviewCount").textContent=pickQueue(d).length+" / "+d.cards.length;let q=pickQueue(d),st=$("reviewStage");if(!q.length){cur=null;st.innerHTML='<div class="card"><div class="meaning">'+tr("empty")+'</div></div>';return}if(!cur||!q.includes(cur)){cur=q[0];revealed=false}let c=cur;st.innerHTML='<div class="card"><div class="word">'+esc(c.de)+'</div><button class="speaker" id="say">🔊</button>'+(revealed?'<div class="meaning">'+esc(c.ar)+'</div>'+(c.ex?'<div class="example">'+esc(c.ex)+'</div>':''):'')+'</div>'+(revealed?'<div class="rate"><button class="again" data-rating="1">'+tr("again")+'<small>'+fmtDays(intervalPreview(c,1,d.algorithm))+'</small></button><button class="hard" data-rating="2">'+tr("hard")+'<small>'+fmtDays(intervalPreview(c,2,d.algorithm))+'</small></button><button class="good" data-rating="3">'+tr("good")+'<small>'+fmtDays(intervalPreview(c,3,d.algorithm))+'</small></button><button class="easy" data-rating="4">'+tr("easy")+'<small>'+fmtDays(intervalPreview(c,4,d.algorithm))+'</small></button></div>':'<button class="primary" id="reveal">'+tr("show")+'</button>');
+$("say").onclick=()=>speak(c.de);if($("reveal"))$("reveal").onclick=()=>{revealed=true;renderReview();speak(c.de)};st.querySelectorAll("[data-rating]").forEach(b=>b.onclick=()=>grade(+b.dataset.rating))}
+function retrievability(c){if(!c.stability||!c.last)return 0;let elapsed=(Date.now()-c.last)/DAY;return Math.pow(1+elapsed/(9*c.stability),-1)}
+function fsrsInterval(c,r){let w=[.4,.6,2.4,5.8,4.93,.94,.86,.01,1.49,.14,.94,2.18,.05,.34,1.26,.29,2.61],D=c.difficulty||5,S=c.stability||0,R=retrievability(c);if(!S){S=w[r-1]||1;D=w[4]-Math.exp(w[5]*(r-1))+1}else if(r===1){S=w[11]*Math.pow(D,-w[12])*(Math.pow(S+1,w[13])-1)*Math.exp((1-R)*w[14]);}else{let hard=r===2? w[15]:1,easy=r===4?w[16]:1;S=S*(1+Math.exp(w[8])*(11-D)*Math.pow(S,-w[9])*(Math.exp((1-R)*w[10])-1)*hard*easy)}return Math.max(r===1?.0069:1,Math.min(3650,S))}
+function intervalPreview(c,r,alg){if(alg==="quick")return .00694;if(alg==="fsrs")return fsrsInterval(c,r);if(alg==="rw")return r===1?.02:r===2?1:r===3?2:4;return r===1?.02:r===2?Math.max(1,(c.interval||1)*.6):r===3?Math.max(1,(c.interval||1)*2||1):Math.max(3,(c.interval||1)*3||3)}
+function grade(r){let d=deck(),c=cur,alg=d.algorithm,iv=intervalPreview(c,r,alg),now=Date.now();if(alg==="quick"){c.due=now;c.interval=0}else{if(alg==="fsrs"){c.stability=iv;c.difficulty=Math.max(1,Math.min(10,(c.difficulty||5)+(r===1?1:r===2?.3:r===4?-.3:-.1)));c.last=now}else if(alg==="general"){c.ease=Math.max(1.3,(c.ease||2.5)+(r===1?-.2:r===2?-.15:r===4?.1:0));c.interval=iv;c.last=now}else{c.interval=iv;c.last=now}c.due=now+iv*DAY;c.reps=(c.reps||0)+1;c.state=r===1?"learning":(r===4&&c.reps>=4?"mastered":"review");}
+let today=dayKey();c.seenDay=today;if(S.lastStudy!==today){S.streak=S.lastStudy===new Date(Date.now()-DAY).toISOString().slice(0,10)?(S.streak||0)+1:1;S.lastStudy=today;S.studyDays=[...(S.studyDays||[]),today].slice(-365)}save();cur=null;revealed=false;renderReview();renderHome();if(S.autoSpeak&&cur)speak(cur.de)}
+function speak(t){if(!window.speechSynthesis||!t)return;speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(t);u.lang="de-DE";u.rate=S.rate||.85;let v=voices.find(x=>x.name===S.voice)||voices[0];if(v)u.voice=v;speechSynthesis.speak(u)}
+function loadVoices(){voices=(window.speechSynthesis?speechSynthesis.getVoices():[]).filter(v=>v.lang.toLowerCase().startsWith("de"));$("voice").innerHTML=voices.map(v=>'<option value="'+esc(v.name)+'">'+esc(v.name)+' ('+esc(v.lang)+')</option>').join("");if(S.voice)$("voice").value=S.voice;$("voiceHint").textContent=voices.length?"":(S.lang==="de"?"Keine deutsche Stimme gefunden.":"لم يتم العثور على صوت ألماني. ثبّت صوت German من إعدادات تحويل النص إلى كلام في الجهاز.")}
+$("voice").onchange=e=>{S.voice=e.target.value;save()};$("speed").oninput=e=>{S.rate=+e.target.value;save()};$("autoSpeak").onchange=e=>{S.autoSpeak=e.target.checked;save()};$("testVoice").onclick=()=>speak("Guten Tag! Ich lerne jeden Tag Deutsch.");
+$("importBtn").onclick=()=>{let d=deck(),rows=$("csv").value.split(/\r?\n/).map(x=>x.split(/[;\t,]/).map(s=>s.trim())).filter(x=>x[0]&&x[1]);rows.forEach(x=>d.cards.push(card(x)));$("csv").value="";save();renderCards();renderHome()};
+$("exportBtn").onclick=()=>{let rows=[["German","Meaning","Example"],...deck().cards.map(c=>[c.de,c.ar,c.ex])];download("deutschkarten.csv",rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(";")).join("\n"),"text/csv")};
+function download(name,data,type){let a=document.createElement("a"),url=URL.createObjectURL(new Blob([data],{type}));a.href=url;a.download=name;a.click();URL.revokeObjectURL(url)}
+$("backupBtn").onclick=()=>download("deutschkarten-backup.json",JSON.stringify(S,null,2),"application/json");
+$("restoreFile").onchange=async e=>{let f=e.target.files[0];if(!f)return;try{let data=JSON.parse(await f.text());if(!Array.isArray(data.decks))throw Error();S={...S,...data};activeDeck=S.decks[0]?.id;save();setLanguage();alert("OK")}catch(x){alert("Invalid JSON backup")}};
+$("newDeck").textContent="＋ "+tr("newDeck");
+migrate();applyTheme();$("speed").value=S.rate;$("autoSpeak").checked=S.autoSpeak;loadVoices();if(window.speechSynthesis)speechSynthesis.onvoiceschanged=loadVoices;setLanguage();showTab("home");
+</script></body></html>
