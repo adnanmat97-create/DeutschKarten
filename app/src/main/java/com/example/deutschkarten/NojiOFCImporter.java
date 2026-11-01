@@ -97,6 +97,7 @@ public final class NojiOFCImporter {
 
             int totalCards = 0;
             int mediaUsed = 0;
+            int mediaCount = 0;
             for (int i = 0; i < sourceDecks.length(); i++) {
                 JSONObject sourceDeck = sourceDecks.optJSONObject(i);
                 if (sourceDeck == null) continue;
@@ -145,6 +146,7 @@ public final class NojiOFCImporter {
                             if (firstImage.isEmpty() && mime.startsWith("image/")) firstImage = dataUrl;
                             if (firstAudio.isEmpty() && mime.startsWith("audio/")) firstAudio = dataUrl;
                             mediaUsed += bytes.length;
+                            mediaCount++;
                         }
                     }
                     card.put("image", firstImage);
@@ -165,7 +167,7 @@ public final class NojiOFCImporter {
             result.put("sourceName", displayName == null ? "Noji OFC" : displayName);
             result.put("decks", outDecks);
             result.put("totalCards", totalCards);
-            result.put("mediaCount", mediaUsed);
+            result.put("mediaCount", mediaCount);
             result.put("progressNote", "تم الاحتفاظ ببيانات كل بطاقة الأصلية في nojiData عند وجودها. لم يتم تحويل جدولة Noji إلى FSRS تلقائياً لأن خوارزميات الجدولة قد تختلف.");
             return result;
         } catch (Throwable error) {
@@ -242,7 +244,7 @@ public final class NojiOFCImporter {
         if (name.endsWith(".m4a")) return "audio/mp4";
         if (name.endsWith(".wav")) return "audio/wav";
         if (name.endsWith(".ogg")) return "audio/ogg";
-        return "image/jpeg";
+        return "application/octet-stream";
     }
 
     private static byte[] readLimited(InputStream in, long limit) throws Exception {
