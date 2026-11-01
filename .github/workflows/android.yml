@@ -33,6 +33,17 @@ jobs:
             "platforms;android-35" \
             "build-tools;35.0.0"
 
+      - name: Set up Node.js for FSRS bundle
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Bundle official FSRS scheduler
+        run: |
+          npm init -y
+          npm install --no-save ts-fsrs@5.4.2 esbuild@0.25.0
+          npx esbuild fsrs-entry.js --bundle --platform=browser --format=iife --outfile=app/src/main/assets/fsrs-engine.js
+
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
