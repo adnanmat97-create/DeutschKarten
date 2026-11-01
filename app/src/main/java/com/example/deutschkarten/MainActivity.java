@@ -153,6 +153,52 @@ public class MainActivity extends Activity {
         public void importImage() {
             runOnUiThread(() -> openDocumentPicker("image"));
         }
+
+        @JavascriptInterface
+        public boolean saveAiConfig(String endpoint, String accessToken) {
+            return AiSecureConfig.save(MainActivity.this, endpoint, accessToken);
+        }
+
+        @JavascriptInterface
+        public boolean hasAiConfig() {
+            return AiSecureConfig.isConfigured(MainActivity.this);
+        }
+
+        @JavascriptInterface
+        public String getAiEndpoint() {
+            return AiSecureConfig.getEndpoint(MainActivity.this);
+        }
+
+        @JavascriptInterface
+        public void clearAiConfig() {
+            AiSecureConfig.clear(MainActivity.this);
+        }
+
+        @JavascriptInterface
+        public void generateCards(String source, String level, String language, int count) {
+            importExecutor.execute(() -> {
+                JSONObject result;
+                try {
+                    result = AiFlashcardClient.generate(MainActivity.this, source, level, language, count);
+                } catch (Throwable error) {
+                    result = new JSONObject();
+                    try {
+                        result.put("success", false);
+                        String message = error.getMessage();
+                        result.put("message", message == null ? "تعذّر إنشاء البطاقات." : message);
+                    } catch (Exception ignored) {}
+                }
+                final String payload = result.toString();
+                runOnUiThread(() -> {
+                    if (webView != null) {
+                        webView.evaluateJavascript(
+                                "window.onAiCardsGenerated(" + JSONObject.quote(payload) + ");",
+                                null
+                        );
+                    }
+                });
+            });
+        }
     }
 
     @Override
