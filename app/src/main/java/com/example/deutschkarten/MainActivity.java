@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
+import android.speech.tts.TextToSpeech;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -16,6 +17,7 @@ import android.widget.Toast;
 import org.json.JSONObject;
 
 import java.io.InputStream;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -25,6 +27,13 @@ public class MainActivity extends Activity {
     private String pendingDocumentType = "pdf";
     private WebView webView;
     private final ExecutorService importExecutor = Executors.newSingleThreadExecutor();
+
+    private TextToSpeech germanTts;
+    private volatile boolean germanTtsReady = false;
+    private volatile boolean germanTtsFailed = false;
+    private volatile String pendingGermanSpeech = "";
+    private volatile float germanSpeechRate = 0.85f;
+    private final Object germanTtsLock = new Object();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +51,7 @@ public class MainActivity extends Activity {
         webView.setWebViewClient(new WebViewClient());
         webView.setWebChromeClient(new WebChromeClient());
         webView.addJavascriptInterface(new AndroidAnkiBridge(), "AndroidAnkiBridge");
+        initializeGermanTts();
         webView.loadUrl("file:///android_asset/index.html");
     }
 
@@ -155,6 +165,47 @@ public class MainActivity extends Activity {
         }
 
         @JavascriptInterface
+        public boolean speakGerman(String text, float rate) {
+            if (text == null || text.trim().isEmpty()) return false;
+            String safeText = text.trim();
+            if (safeText.length() > 2000) safeText = safeText.substring(0, 2000);
+            germanSpeechRate = Math.max(0.5f, Math.min(1.2f, rate));
+            synchronized (germanTtsLock) {
+                if (germanTtsFailed) return false;
+                if (!germanTtsReady || germanTts == null) {
+                    pendingGermanSpeech = safeText;
+                    return true;
+                }
+            }
+            return speakGermanNow(safeText);
+        }
+
+        @JavascriptInterface
+        public boolean isGermanTtsReady() {
+            return germanTtsReady;
+        }
+
+        @JavascriptInterface
+        public boolean isGermanTtsUnavailable() {
+            return germanTtsFailed;
+        }
+
+        @JavascriptInterface
+        public void setGermanSpeechRate(float rate) {
+            germanSpeechRate = Math.max(0.5f, Math.min(1.2f, rate));
+            TextToSpeech engine = germanTts;
+            if (germanTtsReady && engine != null) {
+                engine.setSpeechRate(germanSpeechRate);
+            }
+        }
+
+        @JavascriptInterface
+        public void stopGermanSpeech() {
+            TextToSpeech engine = germanTts;
+            if (engine != null) engine.stop();
+        }
+
+        @JavascriptInterface
         public boolean saveAiConfig(String endpoint, String accessToken) {
             return AiSecureConfig.save(MainActivity.this, endpoint, accessToken);
         }
@@ -201,9 +252,68 @@ public class MainActivity extends Activity {
         }
     }
 
+    private void initializeGermanTts() {
+        germanTts = new TextToSpeech(this, status -> {
+            boolean ready = false;
+            if (status == TextToSpeech.SUCCESS && germanTts != null) {
+                int languageStatus = germanTts.setLanguage(Locale.GERMANY);
+                if (languageStatus == TextToSpeech.LANG_MISSING_DATA
+                        || languageStatus == TextToSpeech.LANG_NOT_SUPPORTED) {
+                    languageStatus = germanTts.setLanguage(Locale.GERMAN);
+                }
+                ready = languageStatus >= TextToSpeech.LANG_AVAILABLE;
+                if (ready) germanTts.setSpeechRate(germanSpeechRate);
+            }
+
+            String queued = "";
+            synchronized (germanTtsLock) {
+                germanTtsReady = ready;
+                germanTtsFailed = !ready;
+                if (ready) {
+                    queued = pendingGermanSpeech;
+                    pendingGermanSpeech = "";
+                } else {
+                    pendingGermanSpeech = "";
+                }
+            }
+
+            if (ready && !queued.isEmpty()) speakGermanNow(queued);
+            final boolean finalReady = ready;
+            runOnUiThread(() -> {
+                if (webView != null) {
+                    webView.evaluateJavascript(
+                            "if(window.onNativeTtsReady)window.onNativeTtsReady("
+                                    + finalReady + ");",
+                            null
+                    );
+                }
+            });
+        });
+    }
+
+    private boolean speakGermanNow(String text) {
+        TextToSpeech engine = germanTts;
+        if (!germanTtsReady || engine == null || text == null || text.trim().isEmpty()) {
+            return false;
+        }
+        engine.setSpeechRate(germanSpeechRate);
+        int result = engine.speak(
+                text,
+                TextToSpeech.QUEUE_FLUSH,
+                null,
+                "deutschkarten-" + System.currentTimeMillis()
+        );
+        return result == TextToSpeech.SUCCESS;
+    }
+
     @Override
     protected void onDestroy() {
         importExecutor.shutdownNow();
+        if (germanTts != null) {
+            germanTts.stop();
+            germanTts.shutdown();
+            germanTts = null;
+        }
         if (webView != null) {
             webView.removeJavascriptInterface("AndroidAnkiBridge");
             webView.destroy();
