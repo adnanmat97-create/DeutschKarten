@@ -258,11 +258,11 @@ $("createDocumentCards").onclick=()=>{
 
 let quizletDrafts=[];
 function parseQuizletExport(raw){
- const source=String(raw||"").replace(/^\\uFEFF/,"").replace(/\\r/g,"").split("\\n").map(x=>x.trim()).filter(Boolean);
+ const source=String(raw||"").replace(/^\uFEFF/,"").replace(/\r/g,"").split("\n").map(x=>x.trim()).filter(Boolean);
  if(!source.length)return [];
  let rows=[];
- const hasTab=source.some(x=>x.includes("\\t"));
- const delimiter=hasTab?"\\t":source.some(x=>x.includes(";"))?";":source.some(x=>x.includes("|"))?"|":null;
+ const hasTab=source.some(x=>x.includes("\t"));
+ const delimiter=hasTab?"\t":source.some(x=>x.includes(";"))?";":source.some(x=>x.includes("|"))?"|":null;
  if(delimiter){
   source.forEach(line=>{
    const parts=line.split(delimiter).map(x=>x.trim());
@@ -274,7 +274,7 @@ function parseQuizletExport(raw){
  if(rows.length&&/^(term|word|begriff|terme)$/i.test(rows[0][0])&&/^(definition|meaning|bedeutung|définition)$/i.test(rows[0][1]))rows.shift();
  const unique=[],seen=new Set();
  rows.slice(0,1000).forEach(([front,back])=>{
-  const key=(front+"\\u0000"+back).toLocaleLowerCase();
+  const key=(front+"\u0000"+back).toLocaleLowerCase();
   if(front&&back&&!seen.has(key)){seen.add(key);unique.push([front,back,""])}
  });
  return unique;
@@ -301,8 +301,8 @@ $("addQuizletCards").onclick=()=>{
  if(!d||!quizletDrafts.length)return;
  let added=0,skipped=0;
  quizletDrafts.forEach(x=>{
-  const key=x[0].trim().toLocaleLowerCase()+"\\u0000"+x[1].trim().toLocaleLowerCase();
-  const duplicate=d.cards.some(c=>(String(c.de||"").trim()+"\\u0000"+String(c.ar||"").trim()).toLocaleLowerCase()===key);
+  const key=x[0].trim().toLocaleLowerCase()+"\u0000"+x[1].trim().toLocaleLowerCase();
+  const duplicate=d.cards.some(c=>(String(c.de||"").trim()+"\u0000"+String(c.ar||"").trim()).toLocaleLowerCase()===key);
   if(duplicate){skipped++;return}
   d.cards.push(card(x));added++;
  });
@@ -312,19 +312,19 @@ $("addQuizletCards").onclick=()=>{
  $("quizletPreviewList").innerHTML="";$("quizletExportText").value="";
 };
 function cleanSubtitleTranscript(raw){
- const lines=String(raw||"").replace(/^\\uFEFF/,"").replace(/\\r/g,"").split("\\n"),segments=[];
+ const lines=String(raw||"").replace(/^\uFEFF/,"").replace(/\r/g,"").split("\n"),segments=[];
  lines.forEach(line=>{
   let s=line.trim();if(!s)return;
-  if(/^(WEBVTT|NOTE(?:\\s|$)|STYLE|REGION)(?:.*)$/i.test(s))return;
-  if(/^\\d+$/.test(s))return;
-  if(/^\\d{1,2}:\\d{2}(?::\\d{2})?[.,]\\d{3}\\s+-->/.test(s))return;
-  if(/^\\d{1,2}:\\d{2}(?::\\d{2})?\\s+-->/.test(s))return;
-  s=s.replace(/^\\d{1,2}:\\d{2}(?::\\d{2})?\\s+/,"");
+  if(/^(WEBVTT|NOTE(?:\s|$)|STYLE|REGION)(?:.*)$/i.test(s))return;
+  if(/^\d+$/.test(s))return;
+  if(/^\d{1,2}:\d{2}(?::\d{2})?[.,]\d{3}\s+-->/.test(s))return;
+  if(/^\d{1,2}:\d{2}(?::\d{2})?\s+-->/.test(s))return;
+  s=s.replace(/^\d{1,2}:\d{2}(?::\d{2})?\s+/,"");
   s=s.replace(/<[^>]*>/g," ").replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&#39;/g,"'");
-  s=s.replace(/\\s+/g," ").trim();
+  s=s.replace(/\s+/g," ").trim();
   if(s&&segments[segments.length-1]!==s)segments.push(s);
  });
- return segments.join(" ").replace(/\\s+/g," ").trim();
+ return segments.join(" ").replace(/\s+/g," ").trim();
 }
 $("sendYoutubeCaptionsToAi").onclick=()=>{
  const source=cleanSubtitleTranscript($("youtubeCaptionText").value);
