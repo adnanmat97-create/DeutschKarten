@@ -324,8 +324,9 @@ function addSelectedAiCards(){
   c.antonyms=Array.isArray(item.antonyms)?item.antonyms:[];c.usageNote=String(item.usage_note||"");c.aiGenerated=true;
   target.cards.push(c);created.push(c);
  });
+ if(created.length)activeDeck=target.id;
  save();renderAll();$("aiGenerationStatus").textContent=aiText("aiAdded",{count:created.length});
- if(created.length){activeDeck=target.id;renderCards();$("cardDeck").value=String(target.id)}
+ if(created.length){renderCards();$("cardDeck").value=String(target.id)}
  aiGeneratedCards=[];renderAiCardsPreview();
 }
 function renderCardExtra(c){
