@@ -2,6 +2,7 @@ package com.example.deutschkarten;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.pdf.PdfRenderer;
 import android.net.Uri;
@@ -43,10 +44,23 @@ public final class DocumentTextExtractor {
                 int pages = 0;
                 int ocrPages = 0;
                 if ("image".equals(type)) {
-                    InputImage image = InputImage.fromFilePath(context, uri);
-                    Text result = Tasks.await(recognizer.process(image));
-                    text = result.getText();
-                    ocrPages = 1;
+                    BitmapFactory.Options bounds = new BitmapFactory.Options();
+                    bounds.inJustDecodeBounds = true;
+                    BitmapFactory.decodeFile(temp.getAbsolutePath(), bounds);
+                    int sample = 1;
+                    while (Math.max(bounds.outWidth / sample, bounds.outHeight / sample) > 2600) sample *= 2;
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inSampleSize = sample;
+                    options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+                    Bitmap bitmap = BitmapFactory.decodeFile(temp.getAbsolutePath(), options);
+                    if (bitmap == null) throw new Exception("تعذر فتح الصورة أو أن تنسيقها غير مدعوم.");
+                    try {
+                        Text result = Tasks.await(recognizer.process(InputImage.fromBitmap(bitmap, 0)));
+                        text = result.getText();
+                        ocrPages = 1;
+                    } finally {
+                        bitmap.recycle();
+                    }
                 } else {
                     PDFBoxResourceLoader.init(context.getApplicationContext());
                     try (PDDocument document = PDDocument.load(temp);
