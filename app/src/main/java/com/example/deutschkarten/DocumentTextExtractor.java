@@ -49,41 +49,49 @@ public final class DocumentTextExtractor {
                     ocrPages = 1;
                 } else {
                     PDFBoxResourceLoader.init(context.getApplicationContext());
-                    text = extractPdfText(temp);
-                    try (ParcelFileDescriptor descriptor = ParcelFileDescriptor.open(temp, ParcelFileDescriptor.MODE_READ_ONLY);
+                    try (PDDocument document = PDDocument.load(temp);
+                         ParcelFileDescriptor descriptor = ParcelFileDescriptor.open(temp, ParcelFileDescriptor.MODE_READ_ONLY);
                          PdfRenderer renderer = new PdfRenderer(descriptor)) {
-                        pages = Math.min(renderer.getPageCount(), MAX_PDF_PAGES);
-                        StringBuilder combined = new StringBuilder(text == null ? "" : text);
+                        if (document.isEncrypted()) throw new Exception("ملفات PDF المحمية بكلمة مرور غير مدعومة حالياً.");
+                        pages = Math.min(Math.min(document.getNumberOfPages(), renderer.getPageCount()), MAX_PDF_PAGES);
+                        StringBuilder combined = new StringBuilder();
                         int checkedOcrPages = 0;
                         for (int pageNumber = 0; pageNumber < pages && combined.length() < MAX_OUTPUT_CHARS; pageNumber++) {
-                            String pageText = "";
-                            try (PdfRenderer.Page page = renderer.openPage(pageNumber)) {
-                                if (page.getWidth() <= 0 || page.getHeight() <= 0) continue;
-                                int width = Math.min(1800, Math.max(600, page.getWidth() * 2));
-                                int height = Math.max(1, Math.round(width * page.getHeight() / (float) page.getWidth()));
-                                Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-                                page.render(bitmap, null, new Matrix(), PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
-                                try {
-                                    Text scanned = Tasks.await(recognizer.process(InputImage.fromBitmap(bitmap, 0)));
-                                    pageText = scanned.getText();
-                                    checkedOcrPages++;
-                                    ocrPages++;
-                                } finally {
-                                    bitmap.recycle();
+                            PDFTextStripper stripper = new PDFTextStripper();
+                            stripper.setStartPage(pageNumber + 1);
+                            stripper.setEndPage(pageNumber + 1);
+                            stripper.setSortByPosition(true);
+                            String pageText = stripper.getText(document);
+                            if (pageText == null || pageText.trim().isEmpty()) {
+                                if (checkedOcrPages < MAX_OCR_PAGES) {
+                                    try (PdfRenderer.Page page = renderer.openPage(pageNumber)) {
+                                        int width = Math.min(1800, Math.max(600, page.getWidth() * 2));
+                                        int height = Math.max(1, Math.round(width * page.getHeight() / (float) page.getWidth()));
+                                        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+                                        Matrix matrix = new Matrix();
+                                        matrix.setScale(width / (float) page.getWidth(), height / (float) page.getHeight());
+                                        page.render(bitmap, null, matrix, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
+                                        try {
+                                            Text scanned = Tasks.await(recognizer.process(InputImage.fromBitmap(bitmap, 0)));
+                                            pageText = scanned.getText();
+                                            ocrPages++;
+                                            checkedOcrPages++;
+                                        } finally {
+                                            bitmap.recycle();
+                                        }
+                                    } catch (Throwable ignored) {
+                                        // Keep any text extracted from the other pages.
+                                    }
                                 }
-                            } catch (Throwable ignored) {
-                                // Keep extracted PDF text even if a scanned page cannot be OCR'd.
                             }
                             if (pageText != null && !pageText.trim().isEmpty()) {
-                                if (combined.length() > 0) combined.append("\n\n");
+                                if (combined.length() > 0) combined.append("\\n\\n");
                                 combined.append(pageText.trim());
                             }
-                            if (checkedOcrPages >= MAX_OCR_PAGES) break;
                         }
                         text = combined.toString();
                     }
-                }
-                if (text == null) text = "";
+                }                if (text == null) text = "";
                 if (text.length() > MAX_OUTPUT_CHARS) text = text.substring(0, MAX_OUTPUT_CHARS);
                 JSONObject result = new JSONObject();
                 result.put("success", true);
