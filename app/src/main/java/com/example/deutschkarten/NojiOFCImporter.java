@@ -141,10 +141,11 @@ public final class NojiOFCImporter {
                             saved.put("filename", filename);
                             saved.put("field", wrapper.optString("field_name", "back_side"));
                             saved.put("mime", mime);
-                            saved.put("data", dataUrl);
+                            boolean primaryMedia = false;
+                            if (firstImage.isEmpty() && mime.startsWith("image/")) { firstImage = dataUrl; primaryMedia = true; }
+                            if (firstAudio.isEmpty() && mime.startsWith("audio/")) { firstAudio = dataUrl; primaryMedia = true; }
+                            if (!primaryMedia) saved.put("data", dataUrl);
                             savedMedia.put(saved);
-                            if (firstImage.isEmpty() && mime.startsWith("image/")) firstImage = dataUrl;
-                            if (firstAudio.isEmpty() && mime.startsWith("audio/")) firstAudio = dataUrl;
                             mediaUsed += bytes.length;
                             mediaCount++;
                         }
@@ -202,7 +203,7 @@ public final class NojiOFCImporter {
         if (value == null) return "";
         String normalized = value.replaceAll("(?i)<br\\s*/?>", "\\n")
                 .replaceAll("(?i)</(p|div|li|h[1-6])\\s*>", "\\n");
-        return Html.fromHtml(normalized, Html.FROM_HTML_MODE_LEGACY).toString().trim();
+        return Html.fromHtml(normalized).toString().trim();
     }
 
     private static Map<String, byte[]> readAttachments(File archive) throws Exception {
