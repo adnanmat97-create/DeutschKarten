@@ -43,7 +43,8 @@ public final class AnkiPackageImporter {
     private static final long MAX_ARCHIVE_BYTES = 220L * 1024L * 1024L;
     private static final long MAX_UNPACKED_BYTES = 350L * 1024L * 1024L;
     private static final int MAX_ENTRIES = 25000;
-    private static final int MAX_CARDS = 12000;
+    private static final int MAX_CARDS = 10000;
+    private static final int MAX_MEDIA_OUTPUT_BYTES = 1400 * 1024;
     private static final long DAY_MS = 86400000L;
 
     private AnkiPackageImporter() {}
@@ -229,6 +230,7 @@ public final class AnkiPackageImporter {
             Map<Long, List<String>> fieldNames = readFieldNames(db, legacyModels);
             Map<Long, String> modelNames = readModelNames(db, legacyModels);
             Map<String, MediaInfo> mediaFiles = new HashMap<>();
+            MediaBudget mediaBudget = new MediaBudget();
             JSONArray outDecks = new JSONArray();
             Map<String, JSONObject> outputByDeck = new HashMap<>();
             Set<Long> missingNotes = new HashSet<>();
@@ -299,8 +301,8 @@ public final class AnkiPackageImporter {
 
                     String imageRef = firstImage(germanHtml + " " + meaningHtml);
                     String audioRef = firstAudio(germanHtml + " " + meaningHtml);
-                    String imageData = imageRef.isEmpty() ? "" : mediaData(imageRef, mediaIndex, mediaDir, mediaFiles, true, modern);
-                    String audioData = audioRef.isEmpty() ? "" : mediaData(audioRef, mediaIndex, mediaDir, mediaFiles, false, modern);
+                    String imageData = imageRef.isEmpty() ? "" : mediaData(imageRef, mediaIndex, mediaDir, mediaFiles, mediaBudget, true, modern);
+                    String audioData = audioRef.isEmpty() ? "" : mediaData(audioRef, mediaIndex, mediaDir, mediaFiles, mediaBudget, false, modern);
 
                     JSONObject card = new JSONObject();
                     card.put("de", german);
@@ -540,7 +542,7 @@ public final class AnkiPackageImporter {
     }
 
     private static String mediaData(String reference, Map<String, String> mediaIndex, File mediaDir,
-                                    Map<String, MediaInfo> cache, boolean image, boolean modern) {
+                                    Map<String, MediaInfo> cache, MediaBudget budget, boolean image, boolean modern) {
         String name = reference == null ? "" : reference.replace('\\', '/');
         int slash = name.lastIndexOf('/');
         if (slash >= 0) name = name.substring(slash + 1);
@@ -562,11 +564,16 @@ public final class AnkiPackageImporter {
         try {
             if (image) {
                 if (info.imageData == null) info.imageData = compressImage(info.bytes);
-                return info.imageData == null ? "" : info.imageData;
+                if (info.imageData == null || budget.used + info.imageData.length() > MAX_MEDIA_OUTPUT_BYTES) return "";
+                budget.used += info.imageData.length();
+                return info.imageData;
             }
             if (info.bytes.length > 512 * 1024) return "";
             String mime = mimeFor(name);
-            return "data:" + mime + ";base64," + Base64.encodeToString(info.bytes, Base64.NO_WRAP);
+            String data = "data:" + mime + ";base64," + Base64.encodeToString(info.bytes, Base64.NO_WRAP);
+            if (budget.used + data.length() > MAX_MEDIA_OUTPUT_BYTES) return "";
+            budget.used += data.length();
+            return data;
         } catch (Throwable ignored) { return ""; }
     }
 
@@ -645,6 +652,10 @@ public final class AnkiPackageImporter {
         final byte[] bytes;
         String imageData;
         MediaInfo(byte[] bytes) { this.bytes = bytes; }
+    }
+
+    private static final class MediaBudget {
+        int used;
     }
 
     private static final class ProtoReader {
