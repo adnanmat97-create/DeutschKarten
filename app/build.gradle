@@ -14,3 +14,7 @@ android {
         versionName '1.0'
     }
 }
+
+dependencies {
+    implementation "com.github.luben:zstd-jni:1.5.7-24@aar"
+}
