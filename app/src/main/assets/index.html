@@ -189,7 +189,7 @@ $("decks").innerHTML=S.decks.map(d=>{
 }).join("");
 $("decks").querySelectorAll("[data-detail]").forEach(b=>b.onclick=()=>openDeckDetail(+b.dataset.detail));
 $("decks").querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{activeDeck=+b.dataset.open;showTab("review")});
-$("decks").querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>editDeck(+b.dataset.edit))
+$("decks").querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>editDeck(+b.dataset.edit))}
 function openDeckDetail(id){
  activeDeck=id;renderDeckDetail();showTab("deckDetail");
 }
