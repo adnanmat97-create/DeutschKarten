@@ -85,13 +85,14 @@ public final class DocumentTextExtractor {
                                 }
                             }
                             if (pageText != null && !pageText.trim().isEmpty()) {
-                                if (combined.length() > 0) combined.append("\\n\\n");
+                                if (combined.length() > 0) combined.append("\n\n");
                                 combined.append(pageText.trim());
                             }
                         }
                         text = combined.toString();
                     }
-                }                if (text == null) text = "";
+                }
+                if (text == null) text = "";
                 if (text.length() > MAX_OUTPUT_CHARS) text = text.substring(0, MAX_OUTPUT_CHARS);
                 JSONObject result = new JSONObject();
                 result.put("success", true);
@@ -134,7 +135,7 @@ public final class DocumentTextExtractor {
                 if (size > MAX_INPUT_BYTES) throw new Exception("حجم الملف أكبر من 45 ميغابايت.");
                 out.write(buffer, 0, read);
             }
-        } catch (Throwable error) {
+        } catch (Exception error) {
             file.delete();
             throw error;
         }
