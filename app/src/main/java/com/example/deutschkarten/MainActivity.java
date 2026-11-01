@@ -1,14 +1,28 @@
 package com.example.deutschkarten;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.OpenableColumns;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
+
+import org.json.JSONObject;
+
+import java.io.InputStream;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MainActivity extends Activity {
+    private static final int PICK_ANKI_PACKAGE = 501;
     private WebView webView;
+    private final ExecutorService importExecutor = Executors.newSingleThreadExecutor();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +39,84 @@ public class MainActivity extends Activity {
 
         webView.setWebViewClient(new WebViewClient());
         webView.setWebChromeClient(new WebChromeClient());
+        webView.addJavascriptInterface(new AndroidAnkiBridge(), "AndroidAnkiBridge");
         webView.loadUrl("file:///android_asset/index.html");
+    }
+
+    private void openAnkiPicker() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("*/*");
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{
+                "application/zip", "application/octet-stream", "application/x-zip-compressed"
+        });
+        startActivityForResult(intent, PICK_ANKI_PACKAGE);
+    }
+
+    private String displayName(Uri uri) {
+        String name = "anki-package.apkg";
+        try (Cursor cursor = getContentResolver().query(uri, null, null, null, null)) {
+            if (cursor != null && cursor.moveToFirst()) {
+                int index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                if (index >= 0) name = cursor.getString(index);
+            }
+        } catch (Throwable ignored) {}
+        return name;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != PICK_ANKI_PACKAGE) return;
+        if (resultCode != RESULT_OK || data == null || data.getData() == null) {
+            Toast.makeText(this, "تم إلغاء اختيار ملف Anki.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Uri uri = data.getData();
+        String name = displayName(uri);
+        Toast.makeText(this, "جارٍ قراءة ملف Anki…", Toast.LENGTH_SHORT).show();
+
+        importExecutor.execute(() -> {
+            JSONObject result;
+            try (InputStream input = getContentResolver().openInputStream(uri)) {
+                if (input == null) throw new Exception("لا يمكن فتح الملف المحدد.");
+                result = AnkiPackageImporter.importPackage(this, input, name);
+            } catch (Throwable error) {
+                result = new JSONObject();
+                try {
+                    result.put("success", false);
+                    result.put("message", error.getMessage() == null ? "تعذّر فتح الملف." : error.getMessage());
+                } catch (Exception ignored) {}
+            }
+            final String payload = result.toString();
+            runOnUiThread(() -> {
+                if (webView != null) {
+                    webView.evaluateJavascript(
+                            "window.onNativeAnkiImportResult(" + JSONObject.quote(payload) + ");",
+                            null
+                    );
+                }
+            });
+        });
+    }
+
+    public class AndroidAnkiBridge {
+        @JavascriptInterface
+        public void importPackage() {
+            runOnUiThread(() -> openAnkiPicker());
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        importExecutor.shutdownNow();
+        if (webView != null) {
+            webView.removeJavascriptInterface("AndroidAnkiBridge");
+            webView.destroy();
+            webView = null;
+        }
+        super.onDestroy();
     }
 
     @Override
