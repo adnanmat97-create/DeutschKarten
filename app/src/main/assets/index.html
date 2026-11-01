@@ -236,6 +236,111 @@ $("createDocumentCards").onclick=()=>{
  }catch(error){d.cards=JSON.parse(snapshot);throw error}
 };
 
+
+let aiGeneratedCards=[];
+function aiText(key,values){let value=tr(key);Object.keys(values||{}).forEach(k=>value=value.replace("{"+k+"}",String(values[k])));return value}
+function updateAiConnectionUi(){
+ const bridge=window.AndroidAnkiBridge;
+ if(bridge&&typeof bridge.hasAiConfig==="function"&&bridge.hasAiConfig()){
+  $("aiEndpoint").value=bridge.getAiEndpoint();$("aiConfigStatus").textContent=tr("aiConfigSaved");
+ }else{
+  $("aiEndpoint").value="";$("aiConfigStatus").textContent=tr("aiConfigRequired");
+ }
+}
+$("saveAiConfig").onclick=()=>{
+ const bridge=window.AndroidAnkiBridge,endpoint=$("aiEndpoint").value.trim(),token=$("aiAccessToken").value.trim();
+ if(!bridge||typeof bridge.saveAiConfig!=="function"){$("aiConfigStatus").textContent=tr("aiOnlyAndroid");return}
+ if(!endpoint.startsWith("https://")||token.length<24){$("aiConfigStatus").textContent=tr("aiConfigMissing");return}
+ const saved=bridge.saveAiConfig(endpoint,token);$("aiAccessToken").value="";
+ $("aiConfigStatus").textContent=saved?tr("aiConfigSaved"):tr("aiConfigMissing");
+};
+$("clearAiConfig").onclick=()=>{
+ const bridge=window.AndroidAnkiBridge;
+ if(bridge&&typeof bridge.clearAiConfig==="function")bridge.clearAiConfig();
+ $("aiEndpoint").value="";$("aiAccessToken").value="";$("aiConfigStatus").textContent=tr("aiConfigCleared");
+};
+$("useExtractedText").onclick=()=>{
+ const textValue=$("extractedDocumentText")?$("extractedDocumentText").value:"";
+ if(textValue.trim()){$("aiSourceText").value=textValue;$("aiGenerationStatus").textContent=""}
+ else $("aiGenerationStatus").textContent=tr("aiNoSource");
+};
+$("generateAiCards").onclick=()=>{
+ const bridge=window.AndroidAnkiBridge,source=$("aiSourceText").value.trim();
+ if(!source){$("aiGenerationStatus").textContent=tr("aiNoSource");return}
+ if(source.length>18000){$("aiGenerationStatus").textContent=tr("aiNoSource");return}
+ if(!bridge||typeof bridge.generateCards!=="function"){$("aiGenerationStatus").textContent=tr("aiOnlyAndroid");return}
+ if(!bridge.hasAiConfig()){$("aiGenerationStatus").textContent=tr("aiConfigRequired");return}
+ $("generateAiCards").disabled=true;$("aiGenerationStatus").textContent=tr("aiGenerating");$("aiResults").classList.add("hide");
+ bridge.generateCards(source,$("aiLevel").value,$("aiTranslation").value,+$("aiCount").value);
+};
+window.onAiCardsGenerated=function(payload){
+ $("generateAiCards").disabled=false;
+ try{
+  const result=typeof payload==="string"?JSON.parse(payload):payload;
+  if(!result||!result.success)throw new Error(result&&result.message?result.message:tr("aiError"));
+  if(!Array.isArray(result.cards)||!result.cards.length)throw new Error(tr("aiNoCards"));
+  aiGeneratedCards=result.cards.map(c=>({...c,_selected:true}));
+  $("aiGenerationStatus").textContent=tr("aiPreview")+": "+aiGeneratedCards.length;
+  renderAiCardsPreview();
+ }catch(error){$("aiGenerationStatus").textContent=error.message||tr("aiError")}
+};
+function renderAiCardsPreview(){
+ const root=$("aiResults");
+ if(!aiGeneratedCards.length){root.classList.add("hide");root.innerHTML="";return}
+ root.classList.remove("hide");
+ root.innerHTML='<div class="topline"><b>'+tr("aiPreview")+'</b><span class="pill">'+aiGeneratedCards.length+'</span></div>'+
+ aiGeneratedCards.map((c,i)=>{
+  const noun=[c.article,c.german].filter(Boolean).join(" ");
+  const extras=[];
+  if(c.word_class)extras.push(tr("aiGrammar")+": "+c.word_class);
+  if(c.cefr_level)extras.push(c.cefr_level);
+  if(c.plural)extras.push(tr("aiPlural")+": "+c.plural);
+  if(c.definition_de)extras.push(tr("aiDefinition")+": "+c.definition_de);
+  if(c.example_de)extras.push(c.example_de);
+  if(c.example_translation)extras.push(tr("aiExampleTranslation")+": "+c.example_translation);
+  if(Array.isArray(c.synonyms)&&c.synonyms.length)extras.push(tr("aiSynonyms")+": "+c.synonyms.join(", "));
+  if(Array.isArray(c.antonyms)&&c.antonyms.length)extras.push(tr("aiAntonyms")+": "+c.antonyms.join(", "));
+  if(c.usage_note)extras.push(tr("aiUsage")+": "+c.usage_note);
+  return '<label class="panel" style="display:block;margin-top:8px"><div class="row" style="padding:0;border:0"><input type="checkbox" data-ai-card="'+i+'" '+(c._selected?'checked':'')+'><div class="grow"><b dir="ltr">'+esc(noun)+'</b><div>'+esc(c.translation||"")+'</div></div><span class="pill">'+esc(c.cefr_level||"")+'</span></div><div class="hint" style="margin-top:7px">'+extras.map(x=>'<div>'+esc(x)+'</div>').join("")+'</div></label>';
+ }).join("")+
+ '<button class="primary wide" id="addAiCardsBtn">'+tr("aiAddSelected")+'</button>';
+ root.querySelectorAll("[data-ai-card]").forEach(input=>input.onchange=()=>{aiGeneratedCards[+input.dataset.aiCard]._selected=input.checked});
+ $("addAiCardsBtn").onclick=addSelectedAiCards;
+}
+function addSelectedAiCards(){
+ const target=S.decks.find(d=>d.id==+$("cardDeck").value)||deck();
+ if(!target)return;
+ const chosen=aiGeneratedCards.filter(c=>c._selected),created=[];
+ chosen.forEach(item=>{
+  const german=String(item.german||"").trim(),translation=String(item.translation||"").trim();
+  if(!german||!translation)return;
+  const headword=item.article?String(item.article).trim()+" "+german:german;
+  const exists=target.cards.some(c=>c.de.toLowerCase()===headword.toLowerCase()&&c.ar.toLowerCase()===translation.toLowerCase());
+  if(exists)return;
+  const c=card([headword,translation,String(item.example_de||"")]);
+  c.article=String(item.article||"");c.plural=String(item.plural||"");c.wordClass=String(item.word_class||"");
+  c.level=String(item.cefr_level||$("aiLevel").value);c.definitionDe=String(item.definition_de||"");
+  c.exampleTranslation=String(item.example_translation||"");c.synonyms=Array.isArray(item.synonyms)?item.synonyms:[];
+  c.antonyms=Array.isArray(item.antonyms)?item.antonyms:[];c.usageNote=String(item.usage_note||"");c.aiGenerated=true;
+  target.cards.push(c);created.push(c);
+ });
+ save();renderAll();$("aiGenerationStatus").textContent=aiText("aiAdded",{count:created.length});
+ if(created.length){activeDeck=target.id;renderCards();$("cardDeck").value=String(target.id)}
+ aiGeneratedCards=[];renderAiCardsPreview();
+}
+function renderCardExtra(c){
+ const bits=[];
+ if(c.wordClass)bits.push(tr("aiGrammar")+": "+c.wordClass);
+ if(c.level)bits.push("CEFR: "+c.level);
+ if(c.article||c.plural)bits.push([c.article,c.plural?tr("aiPlural")+": "+c.plural:""].filter(Boolean).join(" · "));
+ if(c.definitionDe)bits.push(tr("aiDefinition")+": "+c.definitionDe);
+ if(c.exampleTranslation)bits.push(tr("aiExampleTranslation")+": "+c.exampleTranslation);
+ if(c.synonyms&&c.synonyms.length)bits.push(tr("aiSynonyms")+": "+c.synonyms.join(", "));
+ if(c.antonyms&&c.antonyms.length)bits.push(tr("aiAntonyms")+": "+c.antonyms.join(", "));
+ if(c.usageNote)bits.push(tr("aiUsage")+": "+c.usageNote);
+ return bits.length?'<div class="hint" style="text-align:start;width:100%;margin-top:8px">'+bits.map(x=>'<div>'+esc(x)+'</div>').join("")+'</div>':"";
+}
+
 function ankiText(key, values){
  let text=tr(key);Object.keys(values||{}).forEach(k=>{text=text.replace("{"+k+"}",String(values[k]))});return text;
 }
@@ -297,5 +402,5 @@ function download(name,data,type){let a=document.createElement("a"),url=URL.crea
 $("backupBtn").onclick=()=>download("deutschkarten-backup.json",JSON.stringify(S,null,2),"application/json");
 $("restoreFile").onchange=async e=>{let f=e.target.files[0];if(!f)return;try{let data=JSON.parse(await f.text());if(!Array.isArray(data.decks))throw Error();S={...S,...data};S.decks=S.decks.map(d=>({...d,cards:(d.cards||[]).map(c=>({...card([c.de,c.ar,c.ex]),...c}))}));activeDeck=S.decks[0]?.id;save();setLanguage();alert("OK")}catch(x){alert("Invalid JSON backup")}};
 $("newDeck").textContent="＋ "+tr("newDeck");
-migrate();applyTheme();$("speed").value=S.rate;$("autoSpeak").checked=S.autoSpeak;loadVoices();if(window.speechSynthesis)speechSynthesis.onvoiceschanged=loadVoices;setLanguage();showTab("home");
+migrate();applyTheme();$("speed").value=S.rate;$("autoSpeak").checked=S.autoSpeak;loadVoices();if(window.speechSynthesis)speechSynthesis.onvoiceschanged=loadVoices;setLanguage();updateAiConnectionUi();showTab("home");
 </script></body></html>
