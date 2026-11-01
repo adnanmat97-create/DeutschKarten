@@ -29,8 +29,8 @@ public final class NojiOFCImporter {
     private static final long MAX_UNPACKED = 350L * 1024L * 1024L;
     private static final int MAX_ENTRIES = 25000;
     private static final int MAX_CARDS = 20000;
-    private static final int MAX_ONE_MEDIA = 1400 * 1024;
-    private static final int MAX_TOTAL_MEDIA = 24 * 1024 * 1024;
+    private static final int MAX_ONE_MEDIA = 900 * 1024;
+    private static final int MAX_TOTAL_MEDIA = 3 * 1024 * 1024;
 
     private NojiOFCImporter() {}
 
@@ -123,6 +123,7 @@ public final class NojiOFCImporter {
                     JSONArray attachments = note.optJSONArray("note_attachments");
                     JSONArray savedMedia = new JSONArray();
                     String firstImage = "";
+                    String firstAudio = "";
                     if (attachments != null) {
                         for (int a = 0; a < attachments.length(); a++) {
                             JSONObject wrapper = attachments.optJSONObject(a);
@@ -142,10 +143,12 @@ public final class NojiOFCImporter {
                             saved.put("data", dataUrl);
                             savedMedia.put(saved);
                             if (firstImage.isEmpty() && mime.startsWith("image/")) firstImage = dataUrl;
+                            if (firstAudio.isEmpty() && mime.startsWith("audio/")) firstAudio = dataUrl;
                             mediaUsed += bytes.length;
                         }
                     }
                     card.put("image", firstImage);
+                    card.put("audio", firstAudio);
                     card.put("nojiMedia", savedMedia);
                     cards.put(card);
                     totalCards++;
