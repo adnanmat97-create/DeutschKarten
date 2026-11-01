@@ -28,6 +28,7 @@ public class MainActivity extends Activity {
     private static final int PICK_DOCUMENT = 502;
     private static final int PICK_NOJI_FILE = 503;
     private String pendingDocumentType = "pdf";
+    private String pendingNojiImportFormat = "csv";
     private WebView webView;
     private final ExecutorService importExecutor = Executors.newSingleThreadExecutor();
 
@@ -81,6 +82,7 @@ public class MainActivity extends Activity {
     }
 
     private void openNojiImportPicker(String format) {
+        pendingNojiImportFormat = format;
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("*/*");
@@ -137,7 +139,7 @@ public class MainActivity extends Activity {
             }
             Uri uri = data.getData();
             String name = displayName(uri);
-            boolean isOfc = name.toLowerCase(Locale.ROOT).endsWith(".ofc");
+            boolean isOfc = "ofc".equals(pendingNojiImportFormat) || name.toLowerCase(Locale.ROOT).endsWith(".ofc");
             Toast.makeText(this, isOfc ? "جارٍ قراءة نسخة Noji الاحتياطية…" : "جارٍ قراءة ملف CSV…", Toast.LENGTH_SHORT).show();
             importExecutor.execute(() -> {
                 JSONObject result = null;
