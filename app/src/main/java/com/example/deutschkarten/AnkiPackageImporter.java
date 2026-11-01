@@ -288,8 +288,8 @@ public final class AnkiPackageImporter {
                     String frontRaw = valueAt(note.fields, frontIndex);
                     String backRaw = valueAt(note.fields, backIndex);
                     boolean reverse = isReverseModel(note.modelName) && ord > 0;
-                    String germanHtml = reverse ? backRaw : frontRaw;
-                    String meaningHtml = reverse ? frontRaw : backRaw;
+                    String germanHtml = frontRaw;
+                    String meaningHtml = backRaw;
                     String german = cleanHtml(germanHtml);
                     String meaning = cleanHtml(meaningHtml);
                     if (german.isEmpty() && meaning.isEmpty()) continue;
@@ -315,7 +315,7 @@ public final class AnkiPackageImporter {
                     card.put("interval", Math.max(0, ivl));
                     card.put("ease", factor > 0 ? factor / 1000.0 : 2.5);
                     card.put("due", convertDue(queue, due, creationSeconds, now));
-                    card.put("state", queue == 0 ? "new" : (queue == 2 ? "review" : "learning"));
+                    card.put("state", queue == 0 ? "new" : (queue == 2 || queue < 0 ? "review" : "learning"));
                     target.getJSONArray("cards").put(card);
 
                     processed++;
@@ -335,7 +335,8 @@ public final class AnkiPackageImporter {
     }
 
     private static long convertDue(int queue, long due, long creationSeconds, long now) {
-        if (queue == 0 || queue < 0) return now;
+        if (queue == 0) return now;
+        if (queue < 0) return now + DAY_MS * 36500L;
         if (queue == 1) {
             long value = due > 1000000000L ? due * 1000L : due;
             return value > now - DAY_MS * 30 && value < now + DAY_MS * 3650 ? value : now;
