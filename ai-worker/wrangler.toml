@@ -1,0 +1,6 @@
+name = "deutschkarten-ai-worker"
+main = "index.mjs"
+compatibility_date = "2026-11-01"
+
+[vars]
+OPENAI_MODEL = "gpt-6-luna"
