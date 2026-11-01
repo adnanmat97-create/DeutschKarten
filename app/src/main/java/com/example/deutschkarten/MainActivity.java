@@ -21,6 +21,8 @@ import java.util.concurrent.Executors;
 
 public class MainActivity extends Activity {
     private static final int PICK_ANKI_PACKAGE = 501;
+    private static final int PICK_DOCUMENT = 502;
+    private String pendingDocumentType = "pdf";
     private WebView webView;
     private final ExecutorService importExecutor = Executors.newSingleThreadExecutor();
 
@@ -53,6 +55,18 @@ public class MainActivity extends Activity {
         startActivityForResult(intent, PICK_ANKI_PACKAGE);
     }
 
+    private void openDocumentPicker(String type) {
+        pendingDocumentType = type;
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        if ("image".equals(type)) {
+            intent.setType("image/*");
+        } else {
+            intent.setType("application/pdf");
+        }
+        startActivityForResult(intent, PICK_DOCUMENT);
+    }
+
     private String displayName(Uri uri) {
         String name = "anki-package.apkg";
         try (Cursor cursor = getContentResolver().query(uri, null, null, null, null)) {
@@ -67,6 +81,29 @@ public class MainActivity extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_DOCUMENT) {
+            if (resultCode != RESULT_OK || data == null || data.getData() == null) {
+                Toast.makeText(this, "تم إلغاء اختيار المستند.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Uri documentUri = data.getData();
+            String name = displayName(documentUri);
+            String type = pendingDocumentType;
+            Toast.makeText(this, "جارٍ استخراج النص محلياً…", Toast.LENGTH_SHORT).show();
+            importExecutor.execute(() -> {
+                JSONObject result = DocumentTextExtractor.extract(this, documentUri, type, name);
+                final String payload = result.toString();
+                runOnUiThread(() -> {
+                    if (webView != null) {
+                        webView.evaluateJavascript(
+                                "window.onNativeDocumentExtracted(" + JSONObject.quote(payload) + ");",
+                                null
+                        );
+                    }
+                });
+            });
+            return;
+        }
         if (requestCode != PICK_ANKI_PACKAGE) return;
         if (resultCode != RESULT_OK || data == null || data.getData() == null) {
             Toast.makeText(this, "تم إلغاء اختيار ملف Anki.", Toast.LENGTH_SHORT).show();
@@ -105,6 +142,16 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public void importPackage() {
             runOnUiThread(() -> openAnkiPicker());
+        }
+
+        @JavascriptInterface
+        public void importPdf() {
+            runOnUiThread(() -> openDocumentPicker("pdf"));
+        }
+
+        @JavascriptInterface
+        public void importImage() {
+            runOnUiThread(() -> openDocumentPicker("image"));
         }
     }
 
