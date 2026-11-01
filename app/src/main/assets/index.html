@@ -314,7 +314,7 @@ function weakWordStats(){
 function renderWeakWords(){
  const root=$("weakWordsList"),button=$("startWeakReview");if(!root||!button)return;
  const words=weakWordStats();
- root.innerHTML=words.length?words.map((x,i)=>'<div class="row"><div class="grow"><b dir="ltr">'+esc(x.card.de)+'</b><div class="muted">'+esc(x.card.ar)+' · '+esc(x.deckName)+'</div><div class="muted">'+tr("weakErrors")+": "+x.errors+" / "+x.reviews+" · "+tr("weakRate")+": "+Math.round(x.rate*100)+"%</div></div><span class="pill">#'+(i+1)+'</span></div>').join(""):'<p class="hint">'+tr("weakEmpty")+'</p>';
+ root.innerHTML=words.length?words.map((x,i)=>'<div class="row"><div class="grow"><b dir="ltr">'+esc(x.card.de)+'</b><div class="muted">'+esc(x.card.ar)+' · '+esc(x.deckName)+'</div><div class="muted">'+tr("weakErrors")+": "+x.errors+" / "+x.reviews+" · "+tr("weakRate")+": "+Math.round(x.rate*100)+'%</div></div><span class="pill">#'+(i+1)+'</span></div>').join(""):'<p class="hint">'+tr("weakEmpty")+'</p>';
  button.disabled=!words.length;
  button.onclick=()=>{
   const all=[];
@@ -758,12 +758,3 @@ window.onNativeNojiImportResult=function(payload){
    activeDeck=S.decks[S.decks.length-1].id;save();
   }catch(error){S=JSON.parse(snapshot);throw error}
   $("nojiImportStatus").textContent=messageText("nojiImportDone",{cards:imported,decks:addedDecks,media:result.mediaCount||0});$("nojiImportStatus").textContent+="\\n"+tr("nojiProgressWarning");
-  renderAll();renderDeckSelect();
- }catch(error){$("nojiImportStatus").textContent=error.message||tr("csvImportError")}
-};
-function download(name,data,type){let a=document.createElement("a"),url=URL.createObjectURL(new Blob([data],{type}));a.href=url;a.download=name;a.click();URL.revokeObjectURL(url)}
-$("backupBtn").onclick=()=>download("deutschkarten-backup.json",JSON.stringify(S,null,2),"application/json");
-$("restoreFile").onchange=async e=>{let f=e.target.files[0];if(!f)return;try{let data=JSON.parse(await f.text());if(!Array.isArray(data.decks))throw Error();S={...S,...data};S.decks=S.decks.map(d=>({...d,cards:(d.cards||[]).map(c=>({...card([c.de,c.ar,c.ex]),...c}))}));activeDeck=S.decks[0]?.id;save();setLanguage();alert("OK")}catch(x){alert("Invalid JSON backup")}};
-$("newDeck").textContent="＋ "+tr("newDeck");
-migrate();applyTheme();$("speed").value=S.rate;$("autoSpeak").checked=S.autoSpeak;loadVoices();if(window.speechSynthesis)speechSynthesis.onvoiceschanged=loadVoices;setLanguage();updateAiConnectionUi();showTab("home");
-</script></body></html>
