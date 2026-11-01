@@ -43,6 +43,13 @@ jobs:
           npm init -y
           npm install --no-save ts-fsrs@5.4.2 esbuild@0.25.0
           npx esbuild fsrs-entry.js --bundle --platform=browser --format=iife --outfile=app/src/main/assets/fsrs-engine.js
+          python3 - <<'PY'
+          import re
+          html = open("app/src/main/assets/index.html", encoding="utf-8").read()
+          scripts = re.findall(r'<script(?:\\s[^>]*)?>(.*?)</script>', html, re.S)
+          open("/tmp/deutschkarten-inline.js", "w", encoding="utf-8").write(scripts[-1])
+          PY
+          node --check /tmp/deutschkarten-inline.js
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
