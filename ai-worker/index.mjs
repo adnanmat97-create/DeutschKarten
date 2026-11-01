@@ -55,7 +55,7 @@ export default {
     if (length > 70000) return json({ error: "Request is too large." }, 413);
     let body;
     try { body = await request.json(); } catch { return json({ error: "Request body must be valid JSON." }, 400); }
-    const source = safeString(body.text, MAX_INPUT_CHARS);
+    const source = typeof body.text === "string" ? body.text.trim() : "";
     const levels = ["A1", "A2", "B1", "B2", "C1"];
     const level = levels.indexOf(body.level) >= 0 ? body.level : "B1";
     const language = languageName(body.translation_language);
